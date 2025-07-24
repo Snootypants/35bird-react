@@ -1,0 +1,91 @@
+[
+    {
+      "id": "commandDeck",
+      "title": "Command Deck",
+      "tagline": "Cockpit UI for AI-powered workflows",
+      "description": "The Command Deck is a futuristic control panel designed to manage ChatGPT threads, memory streams, and AI agents. Built for developers who want total control over prompt workflows and interaction logic.",
+      "status": "In Progress",
+      "splashImage": "/images/commandDeck.png",
+      "iconImage": "/images/commandDeck-icon.png",
+      "slug": "commandDeck",
+      "folder": "projects/commandDeck",
+      "links": {
+        "live": "projects/commandDeck/index.html",
+        "repo": null
+      },
+      "features": [
+        "Tabbed memory injection",
+        "Headless browser hooks",
+        "Agent orchestration tools"
+      ],
+      "theme": "dark",
+      "priority": 1,
+      "lastUpdate": "2024-01-15"
+    },
+    {
+      "id": "dungeonCrawler",
+      "title": "Dungeon Crawler",
+      "tagline": "Procedural infinite dungeon in Three.js",
+      "description": "An experimental game engine for infinite dungeon crawling built on hex tiles, Three.js, and real-time generation. Designed to test AI code reliability, graphics scaling, and spatial logic.",
+      "status": "Paused",
+      "splashImage": "/images/dungeonCrawler.png",
+      "iconImage": "/images/dungeonCrawler-icon.png",
+      "slug": "dungeonCrawler",
+      "folder": "projects/dungeonCrawler",
+      "links": {
+        "live": "projects/dungeonCrawler/index.html",
+        "repo": null
+      },
+      "features": [
+        "Hex tile generator",
+        "Seamless room transitions",
+        "Visual dungeon mapping"
+      ],
+      "theme": "dark",
+      "priority": 2
+    },
+    {
+      "id": "towerDefenseGame",
+      "title": "Tower Defense Game",
+      "tagline": "Classic tower defense, agent-built",
+      "description": "A stylized tower defense game where enemies follow a set path and players strategically place towers to stop them. A testbed for AI-generated game logic and iterative art pipelines.",
+      "status": "Planning",
+      "splashImage": "/images/towerDefenseGame.png",
+      "iconImage": "/images/towerDefenseGame-icon.png",
+      "slug": "towerDefenseGame",
+      "folder": "projects/towerDefenseGame",
+      "links": {
+        "live": "projects/towerDefenseGame/index.html",
+        "repo": null
+      },
+      "features": [
+        "Tilemap wave system",
+        "Modular tower types",
+        "Stylized art direction"
+      ],
+      "theme": "light",
+      "priority": 3
+    },
+    {
+      "id": "thePublicDeck",
+      "title": "The Public Deck",
+      "tagline": "Collectible cards for public figures",
+      "description": "A satirical but data-driven system that turns public figures into collectible cards. Pulls real data from campaign donors, Wikipedia, IMDb, and more to generate Ghibli-Mucha style art + stats.",
+      "status": "In Progress",
+      "splashImage": "/images/thePublicDeck.png",
+      "iconImage": "/images/thePublicDeck-icon.png",
+      "slug": "thePublicDeck",
+      "folder": "projects/thePublicDeck",
+      "links": {
+        "live": "projects/thePublicDeck/index.html",
+        "repo": null
+      },
+      "features": [
+        "Public figure profiles",
+        "Searchable trait system",
+        "Satire & real data toggle"
+      ],
+      "theme": "ghibli",
+      "priority": 4
+    }
+  ]
