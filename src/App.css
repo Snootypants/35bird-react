@@ -1,46 +1,17 @@
 /* Custom styles for 35Bird React app */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Global page styles */
 .page {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
   position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Custom container styles */
 .container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
-}
-
-/* Hero logo sizing */
-.hero__logo {
-  width: 18.75rem;
-  height: 18.75rem;
-}
-
-/* Custom spacing for projects grid */
-.projects-grid {
-  padding-top: 5rem;
-}
-
-/* Fluid canvas positioning */
-#fluid-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* Line clamp utility */
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }

@@ -4,6 +4,7 @@ import { useTheme } from './hooks/useTheme'
 import Header from './components/layout/Header'
 import HomePage from './components/layout/HomePage'
 import NotFound from './components/layout/NotFound'
+import SplashCursorBackground from './components/effects/SplashCursorBackground'
 import './App.css'
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
     >
         <div className="page bg-background text-foreground">
         {/* Fluid Background Canvas */}
-        <canvas id="fluid-canvas" className="fixed inset-0 z-0" />
+        <SplashCursorBackground />
         
         {/* Header */}
         <Header theme={theme} onThemeToggle={toggleTheme} />

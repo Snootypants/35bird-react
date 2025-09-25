@@ -1,19 +1,6 @@
-import Hero from '../sections/Hero'
-import ProjectGrid from '../sections/ProjectGrid'
-
 function HomePage() {
   return (
-    <>
-      {/* Hero Section */}
-      <Hero />
-      
-      {/* Projects Section */}
-      <section className="section" id="projects">
-        <div className="container">
-          <ProjectGrid />
-        </div>
-      </section>
-    </>
+    <div className="relative min-h-[calc(100vh-5rem)]" />
   )
 }
 
