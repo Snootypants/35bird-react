@@ -3,7 +3,10 @@ import { Typography } from '../ui/typography'
 
 function Hero() {
   return (
-    <section className="hero fixed top-0 left-0 right-0 h-screen flex flex-col items-center justify-center z-10" id="hero">
+    <section
+      className="hero relative z-10 min-h-screen flex flex-col items-center justify-center py-20 sm:py-24"
+      id="hero"
+    >
       <motion.div 
         className="hero-main flex flex-col items-center z-20"
         initial={{ opacity: 0, scale: 0.8 }}
