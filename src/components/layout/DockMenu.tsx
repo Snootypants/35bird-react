@@ -1,13 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  Gamepad2,
-  Hammer,
-  Home,
-  Moon,
-  Sun,
-  type LucideIcon,
-} from 'lucide-react'
+import { Gamepad2, Hammer, Home, Moon, Sun, type LucideIcon } from 'lucide-react'
 import clsx from 'clsx'
 import {
   DOCK_ACTIVE_GAP,
@@ -17,6 +10,7 @@ import {
   DOCK_ICON_SIZE,
   DOCK_TRANSITION,
 } from '../../config/dockMenu'
+import { useHeroSettings } from '../../context/HeroSettingsContext'
 
 interface DockMenuProps {
   theme: 'light' | 'dark'
@@ -39,9 +33,9 @@ const makeIcon = (Icon: LucideIcon) => <Icon className="h-6 w-6" strokeWidth={1.
 
 function DockMenu({ theme, onThemeToggle }: DockMenuProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
+  const { toggleTester, testerOpen } = useHeroSettings()
 
   const iconColor = theme === 'dark' ? '#ffffff' : '#000000'
-  const highlightColor = theme === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.25)'
 
   const items: DockItemConfig[] = [
     {
@@ -52,11 +46,11 @@ function DockMenu({ theme, onThemeToggle }: DockMenuProps) {
       href: '/games',
     },
     {
-      id: 'tools',
-      label: 'Tools',
+      id: 'tester',
+      label: testerOpen ? 'Close tester' : 'Open tester',
       icon: makeIcon(Hammer),
-      action: 'link',
-      href: '/tools',
+      action: 'button',
+      onClick: toggleTester,
     },
     {
       id: 'theme',
@@ -94,9 +88,10 @@ function DockMenu({ theme, onThemeToggle }: DockMenuProps) {
             : 'scale(1)',
           transformOrigin: 'top center',
           filter: isActive ? `blur(${DOCK_ICON_BLUR_ACTIVE})` : 'none',
-          transition: `transform ${DOCK_TRANSITION}, filter ${DOCK_TRANSITION}, box-shadow ${DOCK_TRANSITION}`,
-          color: iconColor,
-          boxShadow: isActive ? `0 0 18px ${highlightColor}` : 'none',
+          transition: `transform ${DOCK_TRANSITION}`,
+          color: item.id === 'tester' && testerOpen ? '#3b82f6' : iconColor,
+          backgroundColor: 'transparent',
+          borderRadius: '9999px',
           overflow: 'visible',
         }
 
