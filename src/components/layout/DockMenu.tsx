@@ -15,9 +15,6 @@ import {
   DOCK_GAP,
   DOCK_ICON_BLUR_ACTIVE,
   DOCK_ICON_SIZE,
-  DOCK_LABEL_FONT_SIZE,
-  DOCK_LABEL_LETTER_SPACING,
-  DOCK_LABEL_SCALE_INACTIVE,
   DOCK_TRANSITION,
 } from '../../config/dockMenu'
 
@@ -103,26 +100,6 @@ function DockMenu({ theme, onThemeToggle }: DockMenuProps) {
           overflow: 'visible',
         }
 
-        const labelStyles: CSSProperties = {
-          pointerEvents: 'none',
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transform: isActive
-            ? 'scale(1)'
-            : `scale(${DOCK_LABEL_SCALE_INACTIVE})`,
-          opacity: isActive ? 1 : 0,
-          transition: `opacity ${DOCK_TRANSITION}, transform ${DOCK_TRANSITION}`,
-          textTransform: 'uppercase',
-          letterSpacing: DOCK_LABEL_LETTER_SPACING,
-          fontWeight: 600,
-          fontSize: DOCK_LABEL_FONT_SIZE,
-          color: 'var(--foreground)',
-          textShadow: isActive ? `0 0 14px ${highlightColor}` : 'none',
-        }
-
         const activate = () => setActiveId(item.id)
         const deactivate = () => setActiveId((prev) => (prev === item.id ? null : prev))
 
@@ -135,10 +112,6 @@ function DockMenu({ theme, onThemeToggle }: DockMenuProps) {
             onFocus={activate}
             onBlur={deactivate}
           >
-            <span className="text-xs font-medium" style={labelStyles}>
-              {item.label}
-            </span>
-
             {item.action === 'link' && item.href ? (
               <Link
                 to={item.href}

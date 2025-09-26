@@ -1,10 +1,7 @@
 export const DOCK_OFFSET = 24
-export const DOCK_GAP = 4
-export const DOCK_ACTIVE_GAP = 12
+export const DOCK_GAP = 2
+export const DOCK_ACTIVE_GAP = 8
 export const DOCK_ICON_SIZE = 40
-export const DOCK_ACTIVE_SCALE = 1.26
+export const DOCK_ACTIVE_SCALE = 1.34
 export const DOCK_TRANSITION = '200ms cubic-bezier(0.4, 0, 0.2, 1)'
-export const DOCK_LABEL_FONT_SIZE = 12
-export const DOCK_LABEL_LETTER_SPACING = '0.18em'
-export const DOCK_LABEL_SCALE_INACTIVE = 0.78
-export const DOCK_ICON_BLUR_ACTIVE = '4px'
+export const DOCK_ICON_BLUR_ACTIVE = '0px'
