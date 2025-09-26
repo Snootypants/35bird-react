@@ -4,17 +4,22 @@ import type { Theme } from '../types'
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     // Get initial theme from localStorage or default to dark
+    let initial: Theme = 'dark'
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem('35bird-theme') as Theme
-        return stored || 'dark'
+        initial = stored || 'dark'
       } catch {
-        // Fallback if localStorage is disabled
         console.warn('localStorage unavailable, using default theme')
-        return 'dark'
+      }
+
+      if (initial === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
       }
     }
-    return 'dark'
+    return initial
   })
 
   useEffect(() => {

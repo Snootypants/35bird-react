@@ -1,69 +1,52 @@
-# React + TypeScript + Vite
+# 35Bird React Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An opinionated React + TypeScript playground for iterating on 35Bird hero concepts. It bundles the production hero mock, a GPU fluid cursor background, and a handful of reusable UI experiments that support the brand.
 
-Currently, two official plugins are available:
+## Features
+- Live hero glow tuner with real-time controls for badge size, spread, intensity, and opacity via `HeroTestingPanel`
+- GPU-accelerated splash cursor background (`SplashCursorBackground`) that renders fluid motion while staying pointer-passive
+- Dock-style command menu anchored top-right for theme switching, hero tester toggling, and quick navigation shortcuts
+- Curated prototypes under `examples/` (dock menu, floating action button, splash cursor variants) for rapid iteration outside the main app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting Started
+### Prerequisites
+- Node.js 18+
+- npm 10+ (a `package-lock.json` is checked in)
 
-## Expanding the ESLint configuration
+### Installation & Development
+```bash
+npm install
+npm run dev
+```
+The dev server runs on Vite with React Fast Refresh. Visit the URL printed in the terminal (defaults to http://localhost:5173).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Production Build
+```bash
+npm run build
+```
+The optimized build is emitted to `dist/`. Inspect it locally with:
+```bash
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Linting
+```bash
+npm run lint
 ```
+Vite ships with TypeScript and ESLint. Tailwind CSS v4 handles global theming via tokens in `src/index.css`.
+
+## Project Structure
+- `src/components/` – layout scaffolding, the dock menu, hero tester panel, and utility effects
+- `src/context/` – hero settings provider powering the tester overlay
+- `src/data/` & `src/lib/` – supporting data/config helpers for prototypes
+- `examples/` – isolated sandboxes for interaction patterns before they ship to `src/`
+- `public/images/` – hero artwork (`hero.png`, `bird.png`) used by the main scene
+
+## Customization Notes
+- Adjust hero defaults in `src/context/HeroSettingsContext.tsx`
+- Replace hero artwork in `public/images/` while keeping transparent backgrounds for best glow results
+- Dock menu dimensions/colors live in `src/config/dockMenu.ts`
+- Tailwind design tokens can be tuned in `tailwind.config.js` and `src/index.css`
+
+## Status
+Internal project; no license has been published. Treat the code as private unless granted permission otherwise.

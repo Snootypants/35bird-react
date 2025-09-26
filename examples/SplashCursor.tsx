@@ -1,8 +1,7 @@
-// @ts-nocheck
 "use client";
 import { useEffect, useRef } from "react";
 
-function SplashCursorBackground({
+export default function SplashCursor({
   // Add whatever props you like for customization
   SIM_RESOLUTION = 128,
   DYE_RESOLUTION = 1440,
@@ -24,16 +23,6 @@ function SplashCursorBackground({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    // Ensure the canvas always hugs the viewport edges regardless of layout wrappers
-    canvas.style.position = 'fixed';
-    canvas.style.top = '0px';
-    canvas.style.left = '0px';
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
-    canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '-10';
-    canvas.style.display = 'block';
 
     function pointerPrototype() {
       this.id = -1;
@@ -822,14 +811,11 @@ function SplashCursorBackground({
     }
 
     function resizeCanvas() {
-      const { innerWidth, innerHeight } = window;
-      const width = scaleByPixelRatio(innerWidth);
-      const height = scaleByPixelRatio(innerHeight);
+      const width = scaleByPixelRatio(canvas.clientWidth);
+      const height = scaleByPixelRatio(canvas.clientHeight);
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
-        canvas.style.width = `${innerWidth}px`;
-        canvas.style.height = `${innerHeight}px`;
         return true;
       }
       return false;
@@ -1095,7 +1081,7 @@ function SplashCursorBackground({
     }
 
     function HSVtoRGB(h, s, v) {
-      let r, g, b, i, f, p, q, t;
+      const r, g, b, i, f, p, q, t;
       i = Math.floor(h * 6);
       f = h * 6 - i;
       p = v * (1 - s);
@@ -1264,7 +1250,9 @@ function SplashCursorBackground({
     TRANSPARENT,
   ]);
 
-  return <canvas ref={canvasRef} id="fluid" className="block" />;
+  return (
+    <div className="fixed top-0 left-0 z-50 pointer-events-none">
+      <canvas ref={canvasRef} id="fluid" className="w-screen h-screen" />
+    </div>
+  );
 }
-
-export default SplashCursorBackground;
