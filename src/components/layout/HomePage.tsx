@@ -8,7 +8,7 @@ function HomePage() {
       <Hero />
       
       {/* Projects Section */}
-      <section className="section" id="projects">
+      <section className="section projects-section" id="projects">
         <div className="container">
           <ProjectGrid />
         </div>

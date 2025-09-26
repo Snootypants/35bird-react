@@ -21,9 +21,30 @@
   height: 18.75rem;
 }
 
+/* Hero layout spacing */
+.hero {
+  min-height: 100vh;
+  padding: 6rem 1.5rem 5rem;
+}
+
+@media (min-width: 640px) {
+  .hero {
+    padding-top: 8rem;
+    padding-bottom: 6rem;
+  }
+}
+
 /* Custom spacing for projects grid */
-.projects-grid {
-  padding-top: 5rem;
+.projects-section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .projects-section {
+    padding-top: 5rem;
+    padding-bottom: 6rem;
+  }
 }
 
 /* Fluid canvas positioning */
