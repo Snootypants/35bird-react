@@ -78,8 +78,8 @@ function HeroTestingPanel() {
           valueLabel={`${Math.round(size)} px`}
           inputProps={{
             id: 'tester-size',
-            min: 200,
-            max: 720,
+            min: 138,
+            max: 368,
             step: 1,
             value: size,
             onChange: (event) => setSize(Number(event.currentTarget.value)),

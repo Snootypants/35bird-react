@@ -18,7 +18,7 @@ type HeroSettingsContextValue = {
 const HeroSettingsContext = createContext<HeroSettingsContextValue | null>(null)
 
 const DEFAULTS = {
-  size: 402,
+  size: 276,
   spread: 0,
   intensity: 0.25,
   opacity: 0.17,
