@@ -92,10 +92,9 @@ function HomePage() {
 
         <div className="space-y-2">
           <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            <span className="text-white/90">Welcome to </span>
-            <span className="bg-gradient-to-r from-sky-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
-              35Bird
-            </span>
+            <span className="text-white">Welcome to</span>
+            {' '}
+            <span className="text-sky-300 sm:text-sky-400">35Bird</span>
           </h1>
           <p className="text-[13px] font-medium uppercase tracking-[0.45em] text-white/85">
             Design · Code · Done
