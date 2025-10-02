@@ -42,10 +42,37 @@ Vite ships with TypeScript and ESLint. Tailwind CSS v4 handles global theming vi
 - `examples/` – isolated sandboxes for interaction patterns before they ship to `src/`
 - `public/images/` – hero artwork (`hero.png`, `bird.png`) used by the main scene
 
+## Dock Menu Architecture
+- `src/data/dockMenuItems.ts` houses the menu definition (IDs, dynamic label/icon resolvers, command keys, and optional children). Edit this file to add, remove, or reorder entries.
+- `src/types/dockMenu.ts` formalizes the menu contracts—`DockMenuItem`, `DockMenuAction`, the runtime context, and the command handler map.
+- `src/components/layout/DockMenu.tsx` renders the interactive dock. It resolves dynamic props with the runtime context, manages hover spacing/animation, and dispatches actions through the handler map.
+- `src/components/layout/Header.tsx` is the bridge into app state: it imports `dockMenuItems`, supplies the hero tester and theme callbacks, and passes any runtime context (`testerOpen`, etc.).
+
+### Visual Overview
+```
+Header
+  ├─ useHeroSettings()
+  ├─ menuActions = { toggleTheme, toggleTester }
+  └─ <DockMenu theme items=dockMenuItems actions=menuActions context={{ testerOpen }}>
+
+DockMenu
+  ├─ runtimeContext = { theme, testerOpen }
+  ├─ resolves dynamic label/icon values
+  ├─ manages hover/open state & styling constants
+  └─ dispatches actions map → matching command handlers
+
+dockMenuItems (data)
+  ├─ Games → link /games
+  ├─ Tools → command openTools
+  └─ Theme → command toggleTheme
+           └─ Page settings → command toggleTester
+```
+
 ## Customization Notes
 - Adjust hero defaults in `src/context/HeroSettingsContext.tsx`
 - Replace hero artwork in `public/images/` while keeping transparent backgrounds for best glow results
 - Dock menu dimensions/colors live in `src/config/dockMenu.ts`
+- Dock menu items, labels, icons, and command keys live in `src/data/dockMenuItems.ts`
 - Tailwind design tokens can be tuned in `tailwind.config.js` and `src/index.css`
 
 ## Status

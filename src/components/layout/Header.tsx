@@ -1,6 +1,10 @@
+import { useMemo } from 'react'
+
 import DockMenu from './DockMenu'
 import type { Theme } from '../../types'
 import { DOCK_OFFSET } from '../../config/dockMenu'
+import { dockMenuItems } from '../../data/dockMenuItems'
+import { useHeroSettings } from '../../context/HeroSettingsContext'
 
 interface HeaderProps {
   theme: Theme
@@ -8,13 +12,28 @@ interface HeaderProps {
 }
 
 function Header({ theme, onThemeToggle }: HeaderProps) {
+  const { toggleTester, testerOpen } = useHeroSettings()
+
+  const menuActions = useMemo(
+    () => ({
+      toggleTheme: onThemeToggle,
+      toggleTester,
+    }),
+    [onThemeToggle, toggleTester],
+  )
+
   return (
     <header className="pointer-events-none">
       <div
         className="fixed z-50 pointer-events-auto"
         style={{ top: `${DOCK_OFFSET}px`, right: `${DOCK_OFFSET}px` }}
       >
-        <DockMenu theme={theme} onThemeToggle={onThemeToggle} />
+        <DockMenu
+          theme={theme}
+          items={dockMenuItems}
+          actions={menuActions}
+          context={{ testerOpen }}
+        />
       </div>
     </header>
   )
