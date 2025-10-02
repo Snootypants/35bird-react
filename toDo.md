@@ -218,3 +218,12 @@ Review 09.27.25 - 18:17
 Review 03.06.25 - 21:32
 - Tightened dock submenu activation so the Tools preview appears only when its child is active.
 - Ensured submenu icons inherit theme-aware colors and captured lint results (existing errors remain in other files).
+
+## 03.06.25 - 21:55
+[x] Investigate submenu hover color and tools preview image issues
+[x] Fix dock submenu styling and ensure tools preview renders
+[x] Run lint check
+Review 03.06.25 - 22:07
+- Removed inline icon color overrides so submenu buttons follow theme hover colors and added fallback image resolution.
+- Ensured tools flyout falls back to the `.png` asset when dynamic probe misses so the preview now appears.
+- Lint still reports existing repo errors (`examples/menu/button.tsx`, `HeroGlow.tsx`, `SplashCursorBackground.tsx`, `HeroSettingsContext.tsx`).

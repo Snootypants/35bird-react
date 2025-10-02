@@ -50,7 +50,7 @@ function DockIconButton({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const variantClasses =
     variant === 'minimal'
-      ? 'rounded-full border-0 border-transparent bg-transparent hover:bg-transparent focus-visible:ring-0'
+      ? 'rounded-full border-0 border-transparent bg-transparent text-inherit hover:bg-transparent focus-visible:ring-0'
       : 'rounded-full border border-white/10 bg-white/0 transition hover:bg-white/15 hover:text-white focus-visible:ring-2 focus-visible:ring-white/40'
 
   return (
@@ -278,11 +278,13 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
         const resolvedActiveChildId = activeId === item.id && hasChildMatch ? activeChildId : null
         const isItemStateActive = item.isActive?.(runtimeContext) ?? false
         const hasActiveChild = resolvedChildren.some((child) => child.isActive?.(runtimeContext))
+        const fallbackPanelImage = panelConfig?.imageBasePath
+          ? `${panelConfig.imageBasePath}.${panelConfig.imageFormats?.[0] ?? DEFAULT_PANEL_IMAGE_FORMATS[0]}`
+          : null
+        const panelImageCandidate = panelConfig?.imageSrc ?? panelImages[item.id] ?? fallbackPanelImage
         const isPanelActive = Boolean(panelConfig && (hasChildren ? resolvedActiveChildId : isHovered))
 
-        const resolvedPanelImage = isPanelActive
-          ? panelConfig?.imageSrc ?? (panelImages[item.id] ?? null)
-          : null
+        const resolvedPanelImage = isPanelActive ? panelImageCandidate : null
         const resolvedPanelTitle = isPanelActive && panelConfig?.title
           ? resolveDynamicProp<string>(panelConfig.title, runtimeContext)
           : null
@@ -452,12 +454,6 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
                         const childIcon = makeIcon(childIconComponent)
                         const isChildActive = resolvedActiveChildId === child.id
 
-                        const childColor = !isChildActive
-                          ? theme === 'dark'
-                            ? 'rgba(255,255,255,0.7)'
-                            : '#475569'
-                          : undefined
-
                         return (
                           <DockIconButton
                             key={child.id}
@@ -471,7 +467,6 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
                             style={{
                               width: DOCK_ICON_SIZE,
                               height: DOCK_ICON_SIZE,
-                              color: childColor,
                             }}
                             onMouseEnter={() => {
                               setActiveChildId(child.id)
