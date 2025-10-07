@@ -2,6 +2,14 @@ import { useMemo, type CSSProperties, type ChangeEvent } from 'react'
 import { X } from 'lucide-react'
 
 import { DOCK_OFFSET } from '../../config/dockMenu'
+import {
+  HERO_GLOW_ANIMATION_DURATION,
+  HERO_GLOW_INTENSITY,
+  HERO_GLOW_OPACITY,
+  HERO_GLOW_SIZE,
+  HERO_GLOW_SPREAD,
+  HERO_TESTER_PANEL_VERTICAL_GAP,
+} from '../../config/heroGlow'
 import { useHeroSettings } from '../../hooks/useHeroSettings'
 
 type RangeControlProps = {
@@ -152,7 +160,7 @@ function HeroTestingPanel() {
   } = useHeroSettings()
 
   const style = useMemo<CSSProperties>(() => {
-    const topOffset = DOCK_OFFSET + 192
+    const topOffset = DOCK_OFFSET + HERO_TESTER_PANEL_VERTICAL_GAP
     const bottomOffset = DOCK_OFFSET
     return {
       top: topOffset,
@@ -208,9 +216,9 @@ function HeroTestingPanel() {
           <RangeControl
             id="hero-size"
             label="Badge Size"
-            min={138}
-            max={368}
-            step={1}
+            min={HERO_GLOW_SIZE.min}
+            max={HERO_GLOW_SIZE.max}
+            step={HERO_GLOW_SIZE.step}
             primaryValue={size}
             secondaryValue={sizeTarget}
             onPrimaryChange={setSize}
@@ -222,9 +230,9 @@ function HeroTestingPanel() {
           <RangeControl
             id="hero-spread"
             label="Glow Spread"
-            min={0}
-            max={1}
-            step={0.01}
+            min={HERO_GLOW_SPREAD.min}
+            max={HERO_GLOW_SPREAD.max}
+            step={HERO_GLOW_SPREAD.step}
             primaryValue={spread}
             secondaryValue={spreadTarget}
             onPrimaryChange={setSpread}
@@ -236,9 +244,9 @@ function HeroTestingPanel() {
           <RangeControl
             id="hero-intensity"
             label="Glow Intensity"
-            min={0}
-            max={1.5}
-            step={0.01}
+            min={HERO_GLOW_INTENSITY.min}
+            max={HERO_GLOW_INTENSITY.max}
+            step={HERO_GLOW_INTENSITY.step}
             primaryValue={intensity}
             secondaryValue={intensityTarget}
             onPrimaryChange={setIntensity}
@@ -250,9 +258,9 @@ function HeroTestingPanel() {
           <RangeControl
             id="hero-opacity"
             label="Glow Opacity"
-            min={0}
-            max={1}
-            step={0.01}
+            min={HERO_GLOW_OPACITY.min}
+            max={HERO_GLOW_OPACITY.max}
+            step={HERO_GLOW_OPACITY.step}
             primaryValue={opacity}
             secondaryValue={opacityTarget}
             onPrimaryChange={setOpacity}
@@ -264,11 +272,12 @@ function HeroTestingPanel() {
           <SingleSlider
             id="hero-duration"
             label="Animation Duration"
-            min={1}
-            max={20}
-            step={0.1}
+            min={HERO_GLOW_ANIMATION_DURATION.min}
+            max={HERO_GLOW_ANIMATION_DURATION.max}
+            step={HERO_GLOW_ANIMATION_DURATION.step}
             value={animationDuration}
             onChange={setAnimationDuration}
+            suffix={HERO_GLOW_ANIMATION_DURATION.suffix}
           />
         </div>
       </div>

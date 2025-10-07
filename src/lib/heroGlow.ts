@@ -1,5 +1,12 @@
 import type { CSSProperties } from 'react'
 
+import {
+  HERO_GLOW_INTENSITY,
+  HERO_GLOW_OPACITY,
+  HERO_GLOW_SIZE,
+  HERO_GLOW_SPREAD,
+} from '../config/heroGlow'
+
 type HeroGlowVariableInput = {
   size: number
   spread: number
@@ -53,10 +60,13 @@ export function buildHeroGlowVariables({
   glowColor,
   forcedSize,
 }: HeroGlowVariableInput): HeroGlowStyleVariables {
-  const clampedSize = Math.max(138, Math.min(368, size))
-  const clampedSpread = Math.max(0, Math.min(1, spread))
-  const clampedIntensity = Math.max(0, Math.min(1.5, intensity))
-  const clampedOpacity = Math.max(0, Math.min(1, opacity))
+  const clampedSize = Math.max(HERO_GLOW_SIZE.min, Math.min(HERO_GLOW_SIZE.max, size))
+  const clampedSpread = Math.max(HERO_GLOW_SPREAD.min, Math.min(HERO_GLOW_SPREAD.max, spread))
+  const clampedIntensity = Math.max(
+    HERO_GLOW_INTENSITY.min,
+    Math.min(HERO_GLOW_INTENSITY.max, intensity),
+  )
+  const clampedOpacity = Math.max(HERO_GLOW_OPACITY.min, Math.min(HERO_GLOW_OPACITY.max, opacity))
 
   const rimBlur = Math.max(2, Math.round(clampedSize * 0.018))
   const wideBlur = Math.round(clampedSize * (0.1 + clampedSpread * 0.3))
@@ -73,7 +83,7 @@ export function buildHeroGlowVariables({
 
   const sizeValue = forcedSize != null
     ? `${forcedSize}px`
-    : `clamp(138px, 35vw, ${clampedSize}px)`
+    : `clamp(${HERO_GLOW_SIZE.min}px, ${HERO_GLOW_SIZE.viewportClamp}, ${clampedSize}px)`
 
   return {
     '--sz': sizeValue,
