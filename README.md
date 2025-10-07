@@ -77,4 +77,4 @@ dockMenuItems (data)
 - Tailwind design tokens can be tuned in `tailwind.config.js` and `src/index.css`
 
 ## Status
-Internal project; no license has been published. Treat the code as private unless granted permission otherwise.
+Proprietary use only. This codebase is not open source; review `LICENSE.md` for the full restrictions and contact the maintainers before using anything here.
