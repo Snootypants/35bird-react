@@ -227,3 +227,27 @@ Review 03.06.25 - 22:07
 - Removed inline icon color overrides so submenu buttons follow theme hover colors and added fallback image resolution.
 - Ensured tools flyout falls back to the `.png` asset when dynamic probe misses so the preview now appears.
 - Lint still reports existing repo errors (`examples/menu/button.tsx`, `HeroGlow.tsx`, `SplashCursorBackground.tsx`, `HeroSettingsContext.tsx`).
+
+
+## 03.06.25 - 22:15
+[x] Review tools panel image resolution logic
+[x] Patch DockMenu to ensure tools preview image renders consistently
+[x] Run lint check
+Review 03.06.25 - 22:24
+- Memoized a cache-busting token and applied it to both dynamic lookups and fallback URLs so the flyout hits the latest /images/menu/tools-preview asset.
+- Reworked the fallback pipeline to prefer cached results but fall back to the cache-busted base path when preloads miss, keeping theme styles untouched.
+- Lint still flags existing repo issues in menu/button, HeroGlow, SplashCursorBackground, and HeroSettingsContext.
+
+## 03.06.25 - 22:32
+[x] Review DockMenu flyout implementation
+[x] Remove flyout and adjust menu layout/actions accordingly
+[x] Run lint check
+Review 03.06.25 - 22:40
+- Simplified DockMenu to render a flat list of icons without hover flyouts while retaining command/link execution.
+- Updated dock data so Tools triggers the test action directly and Page Settings is its own icon.
+- Lint still reports the existing errors in menu/button, HeroGlow, SplashCursorBackground, and HeroSettingsContext.
+
+## 03.06.25 - 22:32
+[ ] Review DockMenu flyout implementation
+[ ] Remove flyout and adjust menu layout/actions accordingly
+[ ] Run lint check

@@ -1,6 +1,6 @@
 import { Gamepad2, Hammer, Home, Moon, Settings2, Sun } from 'lucide-react'
 
-import type { DockMenuItem, DockMenuRuntimeContext } from '@/types/dockMenu'
+import type { DockMenuItem, DockMenuRuntimeContext } from '../types/dockMenu'
 
 const resolveThemeLabel = ({ theme }: DockMenuRuntimeContext) =>
   theme === 'dark' ? 'Light mode' : 'Dark mode'
@@ -22,7 +22,7 @@ export const dockMenuItems: DockMenuItem[] = [
     id: 'tools',
     label: 'Tools',
     icon: Hammer,
-    action: { kind: 'command', command: 'openTools' },
+    action: { kind: 'command', command: 'showTestItem1' },
   },
   {
     id: 'theme',

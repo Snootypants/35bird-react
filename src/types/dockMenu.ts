@@ -1,6 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
 
-export type DockMenuCommandKey = 'toggleTheme' | 'toggleTester' | (string & {})
+export type DockMenuCommandKey =
+  | 'toggleTheme'
+  | 'toggleTester'
+  | 'openTools'
+  | 'showTestItem1'
+  | (string & {})
 
 export type DockMenuAction =
   | {
@@ -14,6 +19,14 @@ export type DockMenuAction =
 
 export type DockMenuDynamicProp<T> = T | ((context: DockMenuRuntimeContext) => T)
 
+export interface DockMenuPanel {
+  title?: DockMenuDynamicProp<string>
+  description?: DockMenuDynamicProp<string>
+  imageSrc?: string
+  imageBasePath?: string
+  imageFormats?: string[]
+}
+
 export interface DockMenuItem {
   id: string
   label: DockMenuDynamicProp<string>
@@ -21,6 +34,7 @@ export interface DockMenuItem {
   action: DockMenuAction
   children?: DockMenuItem[]
   isActive?: (context: DockMenuRuntimeContext) => boolean
+  panel?: DockMenuPanel
 }
 
 export interface DockMenuRuntimeContext {

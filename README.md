@@ -47,6 +47,7 @@ Vite ships with TypeScript and ESLint. Tailwind CSS v4 handles global theming vi
 - `src/types/dockMenu.ts` formalizes the menu contracts—`DockMenuItem`, `DockMenuAction`, the runtime context, and the command handler map.
 - `src/components/layout/DockMenu.tsx` renders the interactive dock. It resolves dynamic props with the runtime context, manages hover spacing/animation, and dispatches actions through the handler map.
 - `src/components/layout/Header.tsx` is the bridge into app state: it imports `dockMenuItems`, supplies the hero tester and theme callbacks, and passes any runtime context (`testerOpen`, etc.).
+- Dock items can define a `panel` block for richer flyouts (image/title/description). Provide either `imageSrc` or an extension-agnostic `imageBasePath` (e.g. `/images/menu/tools-preview`) and any of `.png/.jpg/.jpeg/.webp` will be picked up automatically.
 
 ### Visual Overview
 ```
