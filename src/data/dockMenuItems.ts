@@ -1,15 +1,7 @@
 import { Gamepad2, Hammer, Home, Moon, Settings2, Sun } from 'lucide-react'
 
-import type { DockMenuItem, DockMenuRuntimeContext } from '../types/dockMenu'
-
-const resolveThemeLabel = ({ theme }: DockMenuRuntimeContext) =>
-  theme === 'dark' ? 'Light mode' : 'Dark mode'
-
-const resolveThemeIcon = ({ theme }: DockMenuRuntimeContext) =>
-  (theme === 'dark' ? Sun : Moon)
-
-const resolveTesterLabel = ({ testerOpen }: DockMenuRuntimeContext) =>
-  testerOpen ? 'Close page settings' : 'Page settings'
+import { createDynamicProp } from '../lib/dockMenu'
+import type { DockMenuItem } from '../types/dockMenu'
 
 export const dockMenuItems: DockMenuItem[] = [
   {
@@ -26,14 +18,14 @@ export const dockMenuItems: DockMenuItem[] = [
   },
   {
     id: 'theme',
-    label: resolveThemeLabel,
-    icon: resolveThemeIcon,
+    label: createDynamicProp(({ theme }) => (theme === 'dark' ? 'Light mode' : 'Dark mode')),
+    icon: createDynamicProp(({ theme }) => (theme === 'dark' ? Sun : Moon)),
     action: { kind: 'command', command: 'toggleTheme' },
     isActive: ({ testerOpen }) => Boolean(testerOpen),
     children: [
       {
         id: 'page-settings',
-        label: resolveTesterLabel,
+        label: createDynamicProp(({ testerOpen }) => (testerOpen ? 'Close page settings' : 'Page settings')),
         icon: Settings2,
         action: { kind: 'command', command: 'toggleTester' },
         isActive: ({ testerOpen }) => Boolean(testerOpen),

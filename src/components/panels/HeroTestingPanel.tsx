@@ -2,7 +2,7 @@ import { useMemo, type CSSProperties, type ChangeEvent } from 'react'
 import { X } from 'lucide-react'
 
 import { DOCK_OFFSET } from '../../config/dockMenu'
-import { useHeroSettings } from '../../context/HeroSettingsContext'
+import { useHeroSettings } from '../../hooks/useHeroSettings'
 
 type RangeControlProps = {
   id: string

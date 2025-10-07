@@ -71,10 +71,13 @@ function DockIconButton({
 
 const makeIcon = (Icon: LucideIcon) => <Icon className="h-6 w-6" strokeWidth={1.4} />
 
+const isDynamicResolver = <T,>(value: DockMenuDynamicProp<T>): value is { resolve: (context: DockMenuRuntimeContext) => T } =>
+  typeof value === 'object' && value !== null && 'resolve' in value && typeof value.resolve === 'function'
+
 const resolveDynamicProp = <T,>(
   value: DockMenuDynamicProp<T>,
   context: DockMenuRuntimeContext,
-): T => (typeof value === 'function' ? value(context) : value)
+): T => (isDynamicResolver(value) ? value.resolve(context) : value)
 
 interface DockMenuProps {
   theme: 'light' | 'dark'

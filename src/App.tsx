@@ -4,9 +4,10 @@ import { useTheme } from './hooks/useTheme'
 import Header from './components/layout/Header'
 import HomePage from './components/layout/HomePage'
 import NotFound from './components/layout/NotFound'
+import ComingSoon from './components/layout/ComingSoon'
 import SplashCursorBackground from './components/effects/SplashCursorBackground'
 import HeroTestingPanel from './components/panels/HeroTestingPanel'
-import { HeroSettingsProvider } from './context/HeroSettingsContext'
+import { HeroSettingsProvider } from './context/HeroSettingsProvider'
 import './App.css'
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <main className="main relative z-10" role="main">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/games" element={<ComingSoon title="Games" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
-import { Typography } from '../ui/typography'
+import { Link } from 'react-router-dom'
 import { Home } from 'lucide-react'
+
+import { Typography } from '../ui/typography'
 
 function NotFound() {
   return (
-    <motion.div 
+    <motion.div
       className="min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -24,10 +26,13 @@ function NotFound() {
         <Typography variant="large" className="text-muted-foreground mb-8 max-w-md">
           The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
         </Typography>
-        <a href="/" className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
           <Home className="w-4 h-4" />
           Back to Home
-        </a>
+        </Link>
       </motion.div>
     </motion.div>
   )

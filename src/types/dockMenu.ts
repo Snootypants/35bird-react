@@ -17,7 +17,11 @@ export type DockMenuAction =
       command: DockMenuCommandKey
     }
 
-export type DockMenuDynamicProp<T> = T | ((context: DockMenuRuntimeContext) => T)
+export interface DockMenuDynamicResolver<T> {
+  resolve: (context: DockMenuRuntimeContext) => T
+}
+
+export type DockMenuDynamicProp<T> = T | DockMenuDynamicResolver<T>
 
 export interface DockMenuPanel {
   title?: DockMenuDynamicProp<string>

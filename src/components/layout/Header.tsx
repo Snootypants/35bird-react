@@ -4,7 +4,7 @@ import DockMenu from './DockMenu'
 import type { Theme } from '../../types'
 import { DOCK_OFFSET } from '../../config/dockMenu'
 import { dockMenuItems } from '../../data/dockMenuItems'
-import { useHeroSettings } from '../../context/HeroSettingsContext'
+import { useHeroSettings } from '../../hooks/useHeroSettings'
 
 interface HeaderProps {
   theme: Theme
