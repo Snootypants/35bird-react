@@ -1,3 +1,5 @@
+import type { HeroSettingsValues } from './HeroSettingsContext'
+
 export const heroSettingDefaults = {
   size: 276,
   sizeTarget: 320,
@@ -8,6 +10,6 @@ export const heroSettingDefaults = {
   opacity: 0.17,
   opacityTarget: 0.4,
   animationDuration: 6,
-} as const
+} as const satisfies HeroSettingsValues
 
 export type HeroSettingsDefaults = typeof heroSettingDefaults

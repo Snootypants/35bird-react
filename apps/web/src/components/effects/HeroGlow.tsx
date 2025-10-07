@@ -1,25 +1,20 @@
 import { useMemo } from 'react'
 
+import { HERO_GLOW_DEFAULT_COLOR } from '@/config/heroGlow'
 import heroDefaultImage from '@/assets/hero.png'
 import { useHeroSettings } from '@/hooks/useHeroSettings'
 import { buildHeroGlowVariables, heroGlowCss } from '@/lib/heroGlow'
-
-export type HeroGlowProps = {
-  src?: string
-  alt?: string
-  glowColor?: string
-  className?: string
-  forcedSize?: number
-}
+import type { HeroGlowProps } from '@/types/effects'
 
 export function HeroGlow({
   src = heroDefaultImage,
   alt = 'Hero artwork',
-  glowColor = '#3aa0ff',
+  glowColor = HERO_GLOW_DEFAULT_COLOR,
   className = '',
   forcedSize,
 }: HeroGlowProps) {
-  const { size, spread, intensity, opacity } = useHeroSettings()
+  const { values } = useHeroSettings()
+  const { size, spread, intensity, opacity } = values
 
   const variables = useMemo(
     () =>
@@ -60,3 +55,4 @@ export function HeroGlow({
 }
 
 export default HeroGlow
+export type { HeroGlowProps } from '@/types/effects'

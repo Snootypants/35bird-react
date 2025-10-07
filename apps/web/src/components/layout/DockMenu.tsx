@@ -14,10 +14,19 @@ import {
   DOCK_ACTIVE_GAP,
   DOCK_ACTIVE_SCALE,
   DOCK_GAP,
+  DOCK_ICON_ACTIVE_COLOR,
   DOCK_ICON_BLUR_ACTIVE,
+  DOCK_ICON_COLOR,
   DOCK_ICON_SIZE,
   DOCK_TRANSITION,
 } from '@/config/dockMenu'
+import {
+  DOCK_PANEL_FALLBACK_BACKDROP,
+  DOCK_PANEL_FALLBACK_OVERLAY,
+  DOCK_PANEL_IMAGE_FORMATS,
+  DOCK_PANEL_THEME,
+  DOCK_SUBMENU_VERTICAL_OFFSET,
+} from '@/config/dockMenuPanel'
 import type {
   DockMenuAction,
   DockMenuActionHandlers,
@@ -30,11 +39,6 @@ const baseIconClasses =
   'flex items-center justify-center focus-visible:outline-none cursor-pointer select-none bg-transparent border-0 p-0'
 
 type DockIconButtonVariant = 'default' | 'minimal'
-
-const DEFAULT_PANEL_IMAGE_FORMATS = ['png', 'jpg', 'jpeg', 'webp'] as const
-const SUBMENU_VERTICAL_OFFSET = 16
-const PANEL_DARK_SHADOW = 'shadow-[0_28px_60px_-30px_rgba(56,189,248,0.55)]'
-const PANEL_LIGHT_SHADOW = 'shadow-[0_25px_65px_-35px_rgba(15,23,42,0.25)]'
 
 function DockIconButton({
   label,
@@ -161,7 +165,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
 
           const formats = panel.imageFormats?.length
             ? panel.imageFormats
-            : DEFAULT_PANEL_IMAGE_FORMATS
+            : DOCK_PANEL_IMAGE_FORMATS
 
           for (const ext of formats) {
             const candidate = `${panel.imageBasePath}.${ext}`
@@ -211,7 +215,8 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
     }
   }, [items])
 
-  const iconColor = theme === 'dark' ? '#ffffff' : '#000000'
+  const themeConfig = DOCK_PANEL_THEME[theme]
+  const iconColor = DOCK_ICON_COLOR[theme]
 
   const clearCloseTimer = () => {
     if (closeTimerRef.current !== null) {
@@ -282,7 +287,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
         const isItemStateActive = item.isActive?.(runtimeContext) ?? false
         const hasActiveChild = resolvedChildren.some((child) => child.isActive?.(runtimeContext))
         const fallbackPanelImage = panelConfig?.imageBasePath
-          ? `${panelConfig.imageBasePath}.${panelConfig.imageFormats?.[0] ?? DEFAULT_PANEL_IMAGE_FORMATS[0]}`
+          ? `${panelConfig.imageBasePath}.${panelConfig.imageFormats?.[0] ?? DOCK_PANEL_IMAGE_FORMATS[0]}`
           : null
         const panelImageCandidate = panelConfig?.imageSrc ?? panelImages[item.id] ?? fallbackPanelImage
         const isPanelActive = Boolean(panelConfig && (hasChildren ? resolvedActiveChildId : isHovered))
@@ -299,25 +304,10 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
         const iconComponent = resolveDynamicProp<LucideIcon>(item.icon, runtimeContext)
         const icon = makeIcon(iconComponent)
         const panelImageAlt = resolvedPanelTitle ?? `${label} preview`
-        const panelBackdropClass = resolvedPanelImage
-          ? theme === 'dark'
-            ? 'from-slate-700/80 via-slate-800/80 to-slate-950/80'
-            : 'from-slate-100 via-slate-50 to-white'
-          : 'from-slate-800 via-slate-900 to-black'
-        const panelOverlayClass = resolvedPanelImage
-          ? theme === 'dark'
-            ? 'bg-slate-900/40'
-            : 'bg-white/10'
-          : 'bg-black/35'
-        const panelSurfaceClasses = theme === 'dark'
-          ? 'border-white/15 bg-slate-900/90 text-white shadow-xl'
-          : 'border-slate-200/80 bg-white/95 text-slate-900 shadow-[0_20px_45px_-20px_rgba(15,23,42,0.45)]'
-        const childInactiveClasses = theme === 'dark'
-          ? 'text-white/70 hover:text-white hover:bg-white/10'
-          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-        const childActiveClasses = theme === 'dark'
-          ? 'bg-sky-500/20 text-sky-100 shadow-[0_18px_36px_-24px_rgba(56,189,248,0.9)]'
-          : 'bg-slate-200 text-sky-600 shadow-[0_18px_36px_-26px_rgba(15,23,42,0.4)]'
+        const panelBackdropClass = resolvedPanelImage ? themeConfig.imageBackdrop : DOCK_PANEL_FALLBACK_BACKDROP
+        const panelOverlayClass = resolvedPanelImage ? themeConfig.imageOverlay : DOCK_PANEL_FALLBACK_OVERLAY
+        const childInactiveClasses = themeConfig.childInactive
+        const childActiveClasses = themeConfig.childActive
 
         const iconStyles: CSSProperties = {
           width: DOCK_ICON_SIZE,
@@ -326,7 +316,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
           transformOrigin: 'top center',
           filter: isHovered ? `blur(${DOCK_ICON_BLUR_ACTIVE})` : 'none',
           transition: `transform ${DOCK_TRANSITION}`,
-          color: hasActiveChild || isItemStateActive ? '#3b82f6' : iconColor,
+          color: hasActiveChild || isItemStateActive ? DOCK_ICON_ACTIVE_COLOR : iconColor,
           backgroundColor: 'transparent',
           borderRadius: '9999px',
           overflow: 'visible',
@@ -393,13 +383,13 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
                     <div
                       className={clsx(
                         'absolute right-full mr-4 w-[320px] max-w-[75vw] origin-top-right rounded-3xl border backdrop-blur-lg transition-[transform,opacity,filter] duration-200 ease-out saturate-125',
-                        panelSurfaceClasses,
-                        theme === 'dark' ? PANEL_DARK_SHADOW : PANEL_LIGHT_SHADOW,
+                        themeConfig.surface,
+                        themeConfig.shadow,
                         isPanelActive
                         ? 'pointer-events-auto translate-y-0 opacity-100'
                         : 'pointer-events-none -translate-y-4 translate-x-2 opacity-0 backdrop-blur-sm',
                       )}
-                      style={{ top: SUBMENU_VERTICAL_OFFSET }}
+                      style={{ top: DOCK_SUBMENU_VERTICAL_OFFSET }}
                     >
                       {resolvedPanelImage ? (
                         <div className="overflow-hidden rounded-2xl">
@@ -449,7 +439,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
                           ? 'translate-y-0 opacity-100'
                           : '-translate-y-2 opacity-0 pointer-events-none',
                       )}
-                      style={{ marginTop: SUBMENU_VERTICAL_OFFSET }}
+                      style={{ marginTop: DOCK_SUBMENU_VERTICAL_OFFSET }}
                     >
                     {resolvedChildren.map((child) => {
                         const childLabel = resolveDynamicProp<string>(child.label, runtimeContext)

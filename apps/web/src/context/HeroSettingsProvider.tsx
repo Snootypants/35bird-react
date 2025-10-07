@@ -1,63 +1,110 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useReducer, useState, type ReactNode } from 'react'
 
-import { HeroSettingsContext, type HeroSettingsContextValue } from './HeroSettingsContext'
+import {
+  HeroSettingsContext,
+  type HeroSettingsContextValue,
+  type HeroSettingsKey,
+  type HeroSettingsValues,
+} from './HeroSettingsContext'
 import { heroSettingDefaults } from './heroSettingsDefaults'
 
 type HeroSettingsProviderProps = {
   children: ReactNode
 }
 
+type HeroSettingsAction =
+  | { type: 'update'; key: HeroSettingsKey; value: number }
+  | { type: 'updateMany'; values: Partial<HeroSettingsValues> }
+  | { type: 'reset'; key: HeroSettingsKey }
+  | { type: 'resetAll' }
+
+const heroSettingsReducer = (
+  state: HeroSettingsValues,
+  action: HeroSettingsAction,
+): HeroSettingsValues => {
+  switch (action.type) {
+    case 'update':
+      if (state[action.key] === action.value) {
+        return state
+      }
+      return { ...state, [action.key]: action.value }
+    case 'updateMany': {
+      if (!action.values || Object.keys(action.values).length === 0) {
+        return state
+      }
+      let changed = false
+      const next: HeroSettingsValues = { ...state }
+      for (const [key, value] of Object.entries(action.values) as Array<[HeroSettingsKey, number]>) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          continue
+        }
+        if (next[key] !== value) {
+          next[key] = value
+          changed = true
+        }
+      }
+      return changed ? next : state
+    }
+    case 'reset':
+      if (!(action.key in heroSettingDefaults)) {
+        return state
+      }
+      if (state[action.key] === heroSettingDefaults[action.key]) {
+        return state
+      }
+      return { ...state, [action.key]: heroSettingDefaults[action.key] }
+    case 'resetAll':
+      return { ...heroSettingDefaults }
+    default:
+      return state
+  }
+}
+
 export function HeroSettingsProvider({ children }: HeroSettingsProviderProps) {
-  const [size, setSize] = useState<number>(heroSettingDefaults.size)
-  const [sizeTarget, setSizeTarget] = useState<number>(heroSettingDefaults.sizeTarget)
-  const [spread, setSpread] = useState<number>(heroSettingDefaults.spread)
-  const [spreadTarget, setSpreadTarget] = useState<number>(heroSettingDefaults.spreadTarget)
-  const [intensity, setIntensity] = useState<number>(heroSettingDefaults.intensity)
-  const [intensityTarget, setIntensityTarget] = useState<number>(heroSettingDefaults.intensityTarget)
-  const [opacity, setOpacity] = useState<number>(heroSettingDefaults.opacity)
-  const [opacityTarget, setOpacityTarget] = useState<number>(heroSettingDefaults.opacityTarget)
-  const [animationDuration, setAnimationDuration] = useState<number>(heroSettingDefaults.animationDuration)
+  const [values, dispatch] = useReducer(
+    heroSettingsReducer,
+    heroSettingDefaults,
+    (defaults) => ({ ...defaults }),
+  )
   const [testerOpen, setTesterOpen] = useState(false)
+
+  const updateValue = useCallback((key: HeroSettingsKey, value: number) => {
+    if (!Number.isFinite(value)) {
+      return
+    }
+    dispatch({ type: 'update', key, value })
+  }, [])
+
+  const updateValues = useCallback((changes: Partial<HeroSettingsValues>) => {
+    dispatch({ type: 'updateMany', values: changes })
+  }, [])
+
+  const resetValue = useCallback((key: HeroSettingsKey) => {
+    dispatch({ type: 'reset', key })
+  }, [])
+
+  const resetAll = useCallback(() => {
+    dispatch({ type: 'resetAll' })
+  }, [])
+
+  const openTester = useCallback(() => setTesterOpen(true), [])
+  const closeTester = useCallback(() => setTesterOpen(false), [])
+  const toggleTester = useCallback(() => setTesterOpen((prev) => !prev), [])
 
   const value = useMemo<HeroSettingsContextValue>(
     () => ({
-      size,
-      setSize,
-      sizeTarget,
-      setSizeTarget,
-      spread,
-      setSpread,
-      spreadTarget,
-      setSpreadTarget,
-      intensity,
-      setIntensity,
-      intensityTarget,
-      setIntensityTarget,
-      opacity,
-      setOpacity,
-      opacityTarget,
-      setOpacityTarget,
-      animationDuration,
-      setAnimationDuration,
+      values,
       testerOpen,
-      openTester: () => setTesterOpen(true),
-      closeTester: () => setTesterOpen(false),
-      toggleTester: () => setTesterOpen((prev) => !prev),
+      updateValue,
+      updateValues,
+      resetValue,
+      resetAll,
+      openTester,
+      closeTester,
+      toggleTester,
     }),
-    [
-      animationDuration,
-      intensity,
-      intensityTarget,
-      opacity,
-      opacityTarget,
-      size,
-      sizeTarget,
-      spread,
-      spreadTarget,
-      testerOpen,
-    ],
+    [values, testerOpen, updateValue, updateValues, resetValue, resetAll, openTester, closeTester, toggleTester],
   )
 
   return <HeroSettingsContext.Provider value={value}>{children}</HeroSettingsContext.Provider>
 }
-

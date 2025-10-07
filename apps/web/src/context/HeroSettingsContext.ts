@@ -1,25 +1,26 @@
-import { createContext, type Dispatch, type SetStateAction } from 'react'
+import { createContext } from 'react'
 
-export type HeroSettingsContextValue = {
+export interface HeroSettingsValues {
   size: number
-  setSize: Dispatch<SetStateAction<number>>
   sizeTarget: number
-  setSizeTarget: Dispatch<SetStateAction<number>>
   spread: number
-  setSpread: Dispatch<SetStateAction<number>>
   spreadTarget: number
-  setSpreadTarget: Dispatch<SetStateAction<number>>
   intensity: number
-  setIntensity: Dispatch<SetStateAction<number>>
   intensityTarget: number
-  setIntensityTarget: Dispatch<SetStateAction<number>>
   opacity: number
-  setOpacity: Dispatch<SetStateAction<number>>
   opacityTarget: number
-  setOpacityTarget: Dispatch<SetStateAction<number>>
   animationDuration: number
-  setAnimationDuration: Dispatch<SetStateAction<number>>
+}
+
+export type HeroSettingsKey = keyof HeroSettingsValues
+
+export interface HeroSettingsContextValue {
+  values: HeroSettingsValues
   testerOpen: boolean
+  updateValue: (key: HeroSettingsKey, value: number) => void
+  updateValues: (changes: Partial<HeroSettingsValues>) => void
+  resetValue: (key: HeroSettingsKey) => void
+  resetAll: () => void
   openTester: () => void
   closeTester: () => void
   toggleTester: () => void

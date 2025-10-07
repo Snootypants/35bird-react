@@ -1,32 +1,47 @@
-export function initSplashCursorBackground(canvas, {
-  SIM_RESOLUTION = 128,
-  DYE_RESOLUTION = 1440,
-  CAPTURE_RESOLUTION = 512,
-  DENSITY_DISSIPATION = 3.5,
-  VELOCITY_DISSIPATION = 2,
-  PRESSURE = 0.1,
-  PRESSURE_ITERATIONS = 20,
-  CURL = 3,
-  SPLAT_RADIUS = 0.2,
-  SPLAT_FORCE = 6000,
-  SHADING = true,
-  COLOR_UPDATE_SPEED = 10,
-  BACK_COLOR = { r: 0.5, g: 0, b: 0 },
-  TRANSPARENT = true,
-} = {}) {
+import {
+  createSplashCursorRuntimeConfig,
+  SPLASH_CURSOR_CANVAS_STYLE,
+} from '@/config/splashCursor'
+
+const isRuntimeConfig = (value) =>
+  typeof value === 'object' && value !== null && 'SIM_RESOLUTION' in value
+
+const mergeRuntimeConfig = (overrides) => {
+  const defaults = createSplashCursorRuntimeConfig()
+  return {
+    ...defaults,
+    ...overrides,
+    BACK_COLOR: {
+      ...defaults.BACK_COLOR,
+      ...(overrides?.BACK_COLOR ?? {}),
+    },
+  }
+}
+
+const applyCanvasBaseStyle = (canvas) => {
+  Object.entries(SPLASH_CURSOR_CANVAS_STYLE).forEach(([key, value]) => {
+    canvas.style[key] = value
+  })
+  canvas.style.width = `${window.innerWidth}px`
+  canvas.style.height = `${window.innerHeight}px`
+}
+
+export function initSplashCursorBackground(canvas, overrides = {}) {
   if (!canvas) {
     return () => {};
   }
 
-    // Ensure the canvas always hugs the viewport edges regardless of layout wrappers
-    canvas.style.position = 'fixed';
-    canvas.style.top = '0px';
-    canvas.style.left = '0px';
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
-    canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '-10';
-    canvas.style.display = 'block';
+    applyCanvasBaseStyle(canvas);
+
+    const runtimeConfig = isRuntimeConfig(overrides)
+      ? mergeRuntimeConfig(overrides)
+      : createSplashCursorRuntimeConfig(overrides);
+
+    const config = {
+      ...runtimeConfig,
+      BACK_COLOR: { ...runtimeConfig.BACK_COLOR },
+      PAUSED: false,
+    };
 
     function pointerPrototype() {
       this.id = -1;
@@ -40,24 +55,6 @@ export function initSplashCursorBackground(canvas, {
       this.moved = false;
       this.color = [0, 0, 0];
     }
-
-    const config = {
-      SIM_RESOLUTION,
-      DYE_RESOLUTION,
-      CAPTURE_RESOLUTION,
-      DENSITY_DISSIPATION,
-      VELOCITY_DISSIPATION,
-      PRESSURE,
-      PRESSURE_ITERATIONS,
-      CURL,
-      SPLAT_RADIUS,
-      SPLAT_FORCE,
-      SHADING,
-      COLOR_UPDATE_SPEED,
-      PAUSED: false,
-      BACK_COLOR,
-      TRANSPARENT,
-    };
 
     const pointers = [new pointerPrototype()];
 

@@ -31,3 +31,5 @@ export const HERO_GLOW_ANIMATION_DURATION = {
 } as const
 
 export const HERO_TESTER_PANEL_VERTICAL_GAP = 192
+
+export const HERO_GLOW_DEFAULT_COLOR = '#3aa0ff'

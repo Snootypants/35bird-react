@@ -26,3 +26,5 @@ export interface ThemeContextType {
 }
 
 export * from './dockMenu'
+export * from './splashCursor'
+export * from './effects'
