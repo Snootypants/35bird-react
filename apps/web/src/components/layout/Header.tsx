@@ -26,6 +26,7 @@ function Header({ theme, onThemeToggle }: HeaderProps) {
       toggleTheme: onThemeToggle,
       toggleTester,
       showTestItem1: () => setActiveCommandKey('showTestItem1'),
+      showAsteroids: () => setActiveCommandKey('showAsteroids'),
     }),
     [onThemeToggle, toggleTester, setActiveCommandKey],
   )

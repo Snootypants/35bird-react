@@ -5,6 +5,7 @@ export type DockMenuCommandKey =
   | 'toggleTester'
   | 'openTools'
   | 'showTestItem1'
+  | 'showAsteroids'
   | (string & {})
 
 export type DockMenuAction =

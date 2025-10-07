@@ -1,4 +1,4 @@
-import { Gamepad2, Hammer, Home, Moon, Settings2, Sun } from 'lucide-react'
+import { Gamepad2, Hammer, Home, Moon, Rocket, Settings2, Sun } from 'lucide-react'
 
 import { createDynamicProp } from '@/lib/dockMenu'
 import type { DockMenuItem } from '@/types/dockMenu'
@@ -9,6 +9,14 @@ export const dockMenuItems: DockMenuItem[] = [
     label: 'Games',
     icon: Gamepad2,
     action: { kind: 'link', href: '/games' },
+    children: [
+      {
+        id: 'asteroids',
+        label: 'Asteroids',
+        icon: Rocket,
+        action: { kind: 'command', command: 'showAsteroids' },
+      },
+    ],
   },
   {
     id: 'tools',
