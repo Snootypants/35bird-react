@@ -14,7 +14,7 @@ export const dockMenuItems: DockMenuItem[] = [
         id: 'asteroids',
         label: 'Asteroids',
         icon: Rocket,
-        action: { kind: 'command', command: 'showAsteroids' },
+        action: { kind: 'link', href: '/play/asteroids' },
       },
     ],
   },

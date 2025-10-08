@@ -20,4 +20,36 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  {
+    files: ['packages/**/*.{js,jsx,ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['apps/*'],
+              message: 'Packages must not import from apps/*',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/**/*.{js,jsx,ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['packages/asteroids/src/*', '@35bird/asteroids/*'],
+              message: 'Apps should import Asteroids via @35bird/asteroids entry point',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ])
