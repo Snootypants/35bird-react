@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import type { LucideIcon } from 'lucide-react'
+import { Palette, type LucideIcon } from 'lucide-react'
 import clsx from 'clsx'
 
 import {
