@@ -15,3 +15,21 @@
   margin: 0 auto;
   padding: 0 1.5rem;
 }
+
+.asteroids-layout {
+  background-color: #000;
+  color: #fff;
+}
+
+.asteroids-page {
+  background-color: #000;
+  color: #fff;
+}
+
+.asteroids-main {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+}

@@ -6,7 +6,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -91,6 +91,7 @@ interface DockMenuProps {
 }
 
 function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
+  const navigate = useNavigate()
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeChildId, setActiveChildId] = useState<string | null>(null)
   const closeTimerRef = useRef<number | null>(null)
@@ -98,6 +99,8 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
   const [panelImages, setPanelImages] = useState<Record<string, string | null>>({})
 
   const runtimeContext: DockMenuRuntimeContext = { theme, ...(context ?? {}) }
+  const { minimal = false } = runtimeContext as { minimal?: boolean }
+
 
   useEffect(() => () => {
     if (closeTimerRef.current !== null) {
@@ -259,6 +262,8 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
     if (action.kind === 'command') {
       const handler = actions[action.command]
       handler?.()
+    } else if (action.kind === 'link') {
+      navigate(action.href)
     }
     requestAnimationFrame(() => {
       setActiveId(null)
@@ -302,7 +307,8 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
 
         const label = resolveDynamicProp<string>(item.label, runtimeContext)
         const iconComponent = resolveDynamicProp<LucideIcon>(item.icon, runtimeContext)
-        const icon = makeIcon(iconComponent)
+        const iconSource = minimal ? Palette : iconComponent
+        const icon = makeIcon(iconSource)
         const panelImageAlt = resolvedPanelTitle ?? `${label} preview`
         const panelBackdropClass = resolvedPanelImage ? themeConfig.imageBackdrop : DOCK_PANEL_FALLBACK_BACKDROP
         const panelOverlayClass = resolvedPanelImage ? themeConfig.imageOverlay : DOCK_PANEL_FALLBACK_OVERLAY

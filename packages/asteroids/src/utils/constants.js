@@ -1,160 +1,144 @@
-// Canvas & Display Configuration
-export const CANVAS_CONFIG = {
-  WIDTH: 1200,
-  HEIGHT: 900,
-  CROSSHAIR_SIZE: 10,
-  MOUSE_OFFSET: 50
-};
-
-// World Configuration
-export const WORLD_CONFIG = {
-  WIDTH: 6000,
-  HEIGHT: 5500,
-  VIEWPORT_WIDTH: 1200, // CANVAS_WIDTH
-  VIEWPORT_HEIGHT: 900  // CANVAS_HEIGHT
-};
-
-// Ship Configuration
-export const SHIP_CONFIG = {
-  SIZE: 10,
-  SPEED: 0.12,
-  FRICTION: 0.99,
-  DECELERATION: 0.92,
-  INITIAL_LIVES: 3
-};
-
-// Weapon Configuration
+// Game constants for easy tuning and expansion
+export const CANVAS_WIDTH = 1200;
+export const CANVAS_HEIGHT = 900;
+export const SHIP_SIZE = 10;
+export const SHIP_SPEED = 0.12; // reduced for lower max ship speed
+// One place to configure firing cadence (also used for hold fire)
 const FIRE_RATE_MS = 250; // 4 shots per second
-export const WEAPON_CONFIG = {
-  BULLET_FIRE_RATE: FIRE_RATE_MS,
-  BULLET_SPEED: 20,
-  BULLET_LIFETIME: 100, // frames
-  BULLET_SIZE: 2,
-  BULLET_RANGE: 1200 * 2, // twice viewport width
-  MAX_BULLETS: 5
-};
+export const BULLET_FIRE_RATE = FIRE_RATE_MS; // backwards compatibility
+export const BULLET_SPEED = 20; // slightly faster bullets
+export const BULLET_LIFETIME = 100; // frames
+export const ASTEROID_SPEED = 2;
+export const ASTEROID_SIZE_LARGE = 40;
+export const ASTEROID_SIZE_MEDIUM = 20;
+export const ASTEROID_SIZE_SMALL = 10;
+export const ASTEROID_SPLIT_SPEED_VARIANCE = 0.4; // speed scaling range when splitting
+export const ASTEROID_ROTATION_VARIANCE = 0.1; // rotation speed range
+export const ASTEROID_POINT_RANGE = 4; // additional points added to base shape (8-11)
+export const STAR_COUNT = 2000; // Increased star density
+export const STAR_MIN_BRIGHTNESS = 0.2;
+export const STAR_MAX_BRIGHTNESS = 1.0;
 
-// Asteroid Configuration
-export const ASTEROID_CONFIG = {
-  SPEED: 2,
-  SIZE_LARGE: 40,
-  SIZE_MEDIUM: 20,
-  SIZE_SMALL: 10,
-  SPLIT_SPEED_VARIANCE: 0.4,
-  ROTATION_VARIANCE: 0.1,
-  POINT_RANGE: 4,
-  INITIAL_COUNT: 5
-};
+// Game configuration constants
+export const INITIAL_ASTEROID_COUNT = 5;
+export const MAX_BULLETS = 5;
+export const CROSSHAIR_SIZE = 10;
+export const MOUSE_OFFSET = 50;
+export const INITIAL_LIVES = 3;
+export const BULLET_SIZE = 2;
 
-// Scoring & Progression
-export const SCORING_CONFIG = {
-  SCORE_PER_ASTEROID: 10,
-  XP_PER_ASTEROID: 18,
-  XP_LEVEL_BASE: 300,
-  XP_LEVEL_GROWTH: 1.25
-};
+// Loot & progression
+export const XP_PICKUP_VALUE = 5;           // XP granted per pickup orb
+export const CURRENCY_DROP_CHANCE = 0.4;    // Chance an asteroid drops currency
+export const XP_DROP_WEIGHTS = [            // Bell-curve weights for XP orb count
+  { amount: 1, weight: 0.1 },
+  { amount: 2, weight: 0.25 },
+  { amount: 3, weight: 0.3 },
+  { amount: 4, weight: 0.25 },
+  { amount: 5, weight: 0.1 },
+];
+export const CURRENCY_DROP_WEIGHTS = [      // Bell-curve weights for 1-5 currency
+  { amount: 1, weight: 0.1 },
+  { amount: 2, weight: 0.25 },
+  { amount: 3, weight: 0.3 },
+  { amount: 4, weight: 0.25 },
+  { amount: 5, weight: 0.1 },
+];
+export const PICKUP_POP_SPEED = 1.4;        // Initial burst speed when spawned
+export const PICKUP_DRAG = 0.92;            // Damping per frame while floating
+export const PICKUP_ATTRACT_RADIUS = 220;   // Distance where pickups home to ship
+export const PICKUP_COLLECT_RADIUS = 26;    // Distance to actually collect
+export const PICKUP_MAX_SPEED = 6;          // Cap attraction velocity
+export const PICKUP_LIFETIME_FRAMES = 60 * 15; // 15 seconds before fading
+export const PICKUP_HYPER_SPEED = 20;       // Burst speed when hyperspace kicks in
+export const PICKUP_HYPER_ACCEL = 1.06;     // Exponential speed up for streak effect
+export const PICKUP_HYPER_DURATION = 90;    // Frames before pickup expires in hyperspace
+export const XP_LEVEL_BASE = 300;           // XP needed for level 1→2
+export const XP_LEVEL_GROWTH = 1.25;        // Each level requires 25% more XP than previous
+export const HYPER_JUMP_COUNTDOWN_MS = 5000; // Grace period before waves hyperspace
+export const GAME_WARMUP_DURATION_MS = 2000;
+export const GAME_WARMUP_BLINKS_PER_SECOND = 3;
+export const SURVIVAL_LIVES = 1;
+const LEGACY_SURVIVAL_CURVE_TAU = 20;
+export const SURVIVAL_SPEED_MAX_MULTIPLIER = 2.5;
+export const SURVIVAL_SPEED_CURVE_BASE_TAU = LEGACY_SURVIVAL_CURVE_TAU;
+export const SURVIVAL_SPEED_CURVE_STRETCH = 8; // Stretch curve farther for gentler ramp
+export const SURVIVAL_SPEED_RAMP_DURATION_MS = 8 * 60 * 1000;
+export const SURVIVAL_TUNING_DEFAULTS = Object.freeze({
+  spawnIntervalMs: 2000,
+  maxMultiplier: SURVIVAL_SPEED_MAX_MULTIPLIER,
+  baseTau: SURVIVAL_SPEED_CURVE_BASE_TAU,
+  stretch: SURVIVAL_SPEED_CURVE_STRETCH,
+  rampDurationMs: SURVIVAL_SPEED_RAMP_DURATION_MS,
+});
+export const SURVIVAL_PORTAL_OPEN_MS = 6 * 60 * 1000;
+export const SURVIVAL_PORTAL_INNER_MARGIN_RATIO = 0.1; // Keep portals inside 80% of the world
+export const WAVE_SPEED_CURVE_TAU = 4;       // Controls diminishing returns per wave
+export const WAVE_SPEED_MIN_ADD = 0.6;       // Extra speed applied to the slowest wave rocks at cap
+export const WAVE_SPEED_MAX_ADD = 3.2;       // Additional headroom for the fastest wave rocks at cap
 
-// Star Configuration
-export const STAR_CONFIG = {
-  COUNT: 2000,
-  MIN_BRIGHTNESS: 0.2,
-  MAX_BRIGHTNESS: 1.0,
-  LARGE_THRESHOLD: 0.7,
-  MEDIUM_THRESHOLD: 0.4,
-  FIELD_MULTIPLIER: 3,
-  FIELD_SPREAD: 1.5,
-  MIN_PARALLAX: 0.3,
-  MAX_PARALLAX: 0.7
-};
+// Level-up effects
+export const LEVELUP_PARTICLES = 225;       // +50% bigger burst
+export const LEVELUP_PARTICLE_SPEED = 12;   // +50% faster particles
+export const LEVELUP_PARTICLE_LIFE = 40;    // frames
+export const LEVELUP_FLASH_DECAY = 0.02;    // alpha per frame (after hold)
+export const LEVELUP_FLASH_HOLD = 12;       // frames to keep flash at full intensity
+export const LEVELUP_TEXT_TIME = 120;       // frames to show text (~2s)
 
-// Camera Configuration
-export const CAMERA_CONFIG = {
-  MAX_ZOOM_OUT: 3,
-  MIN_ZOOM: 1,
-  ZOOM_SPEED: 0.1,
-  ZOOM_INTERPOLATION: 0.1
-};
+// Stage Clear effect timings (in frames)
+export const STAGE_CLEAR_SLIDE_TIME = 30;   // Time to slide in from left
+export const STAGE_CLEAR_POP_TIME = 15;     // Time for pop animation
+export const STAGE_CLEAR_HOLD_TIME = 45;    // Time to hold at center
+export const STAGE_CLEAR_FADE_TIME = 20;    // Time to fade out
 
-// Effect Configurations
-export const LEVELUP_CONFIG = {
-  PARTICLES: 225,
-  PARTICLE_SPEED: 12,
-  PARTICLE_LIFE: 40,
-  FLASH_DECAY: 0.06,
-  TEXT_TIME: 75
-};
+// HyperSpace Jump effect timings (in frames)  
+export const HYPERSPACE_STREAK_TIME = 60;    // Time for stars to streak
+export const HYPERSPACE_FADE_TIME = 30;      // Time to fade to black
+export const HYPERSPACE_TEXT_TIME = 30;      // Time for text animation
+export const HYPERSPACE_BRIGHTEN_TIME = 20;  // Time to brighten stars
+export const HYPERSPACE_FLASH_TIME = 8;      // Time for white flash
 
-export const STAGE_CLEAR_CONFIG = {
-  SLIDE_TIME: 30,
-  POP_TIME: 15,
-  HOLD_TIME: 45,
-  FADE_TIME: 20
-};
+// Star brightness thresholds
+export const STAR_LARGE_THRESHOLD = 0.7;
+export const STAR_MEDIUM_THRESHOLD = 0.4;
 
-export const HYPERSPACE_CONFIG = {
-  STREAK_TIME: 60,
-  FADE_TIME: 30,
-  TEXT_TIME: 30,
-  BRIGHTEN_TIME: 20,
-  FLASH_TIME: 8
-};
+// Phase 2: Big Map constants
+// Large world; shape is authoritative for the minimap
+export const VIEWPORT_WIDTH = CANVAS_WIDTH;
+export const VIEWPORT_HEIGHT = CANVAS_HEIGHT;
+export const WORLD_WIDTH = 8000; // requested width
+export const WORLD_HEIGHT = 5500; // requested height
 
-// Legacy exports for backward compatibility
-export const CANVAS_WIDTH = CANVAS_CONFIG.WIDTH;
-export const CANVAS_HEIGHT = CANVAS_CONFIG.HEIGHT;
-export const SHIP_SIZE = SHIP_CONFIG.SIZE;
-export const SHIP_SPEED = SHIP_CONFIG.SPEED;
-export const BULLET_FIRE_RATE = WEAPON_CONFIG.BULLET_FIRE_RATE;
-export const BULLET_SPEED = WEAPON_CONFIG.BULLET_SPEED;
-export const BULLET_LIFETIME = WEAPON_CONFIG.BULLET_LIFETIME;
-export const BULLET_SIZE = WEAPON_CONFIG.BULLET_SIZE;
-export const BULLET_RANGE = WEAPON_CONFIG.BULLET_RANGE;
-export const ASTEROID_SPEED = ASTEROID_CONFIG.SPEED;
-export const ASTEROID_SIZE_LARGE = ASTEROID_CONFIG.SIZE_LARGE;
-export const ASTEROID_SIZE_MEDIUM = ASTEROID_CONFIG.SIZE_MEDIUM;
-export const ASTEROID_SIZE_SMALL = ASTEROID_CONFIG.SIZE_SMALL;
-export const ASTEROID_SPLIT_SPEED_VARIANCE = ASTEROID_CONFIG.SPLIT_SPEED_VARIANCE;
-export const ASTEROID_ROTATION_VARIANCE = ASTEROID_CONFIG.ROTATION_VARIANCE;
-export const ASTEROID_POINT_RANGE = ASTEROID_CONFIG.POINT_RANGE;
-export const STAR_COUNT = STAR_CONFIG.COUNT;
-export const STAR_MIN_BRIGHTNESS = STAR_CONFIG.MIN_BRIGHTNESS;
-export const STAR_MAX_BRIGHTNESS = STAR_CONFIG.MAX_BRIGHTNESS;
-export const INITIAL_ASTEROID_COUNT = ASTEROID_CONFIG.INITIAL_COUNT;
-export const MAX_BULLETS = WEAPON_CONFIG.MAX_BULLETS;
-export const CROSSHAIR_SIZE = CANVAS_CONFIG.CROSSHAIR_SIZE;
-export const MOUSE_OFFSET = CANVAS_CONFIG.MOUSE_OFFSET;
-export const SCORE_PER_ASTEROID = SCORING_CONFIG.SCORE_PER_ASTEROID;
-export const INITIAL_LIVES = SHIP_CONFIG.INITIAL_LIVES;
-export const XP_PER_ASTEROID = SCORING_CONFIG.XP_PER_ASTEROID;
-export const XP_LEVEL_BASE = SCORING_CONFIG.XP_LEVEL_BASE;
-export const XP_LEVEL_GROWTH = SCORING_CONFIG.XP_LEVEL_GROWTH;
-export const LEVELUP_PARTICLES = LEVELUP_CONFIG.PARTICLES;
-export const LEVELUP_PARTICLE_SPEED = LEVELUP_CONFIG.PARTICLE_SPEED;
-export const LEVELUP_PARTICLE_LIFE = LEVELUP_CONFIG.PARTICLE_LIFE;
-export const LEVELUP_FLASH_DECAY = LEVELUP_CONFIG.FLASH_DECAY;
-export const LEVELUP_TEXT_TIME = LEVELUP_CONFIG.TEXT_TIME;
-export const STAGE_CLEAR_SLIDE_TIME = STAGE_CLEAR_CONFIG.SLIDE_TIME;
-export const STAGE_CLEAR_POP_TIME = STAGE_CLEAR_CONFIG.POP_TIME;
-export const STAGE_CLEAR_HOLD_TIME = STAGE_CLEAR_CONFIG.HOLD_TIME;
-export const STAGE_CLEAR_FADE_TIME = STAGE_CLEAR_CONFIG.FADE_TIME;
-export const HYPERSPACE_STREAK_TIME = HYPERSPACE_CONFIG.STREAK_TIME;
-export const HYPERSPACE_FADE_TIME = HYPERSPACE_CONFIG.FADE_TIME;
-export const HYPERSPACE_TEXT_TIME = HYPERSPACE_CONFIG.TEXT_TIME;
-export const HYPERSPACE_BRIGHTEN_TIME = HYPERSPACE_CONFIG.BRIGHTEN_TIME;
-export const HYPERSPACE_FLASH_TIME = HYPERSPACE_CONFIG.FLASH_TIME;
-export const STAR_LARGE_THRESHOLD = STAR_CONFIG.LARGE_THRESHOLD;
-export const STAR_MEDIUM_THRESHOLD = STAR_CONFIG.MEDIUM_THRESHOLD;
-export const VIEWPORT_WIDTH = WORLD_CONFIG.VIEWPORT_WIDTH;
-export const VIEWPORT_HEIGHT = WORLD_CONFIG.VIEWPORT_HEIGHT;
-export const WORLD_WIDTH = WORLD_CONFIG.WIDTH;
-export const WORLD_HEIGHT = WORLD_CONFIG.HEIGHT;
-export const MAX_ZOOM_OUT = CAMERA_CONFIG.MAX_ZOOM_OUT;
-export const MIN_ZOOM = CAMERA_CONFIG.MIN_ZOOM;
-export const ZOOM_SPEED = CAMERA_CONFIG.ZOOM_SPEED;
-export const SHIP_FRICTION = SHIP_CONFIG.FRICTION;
-export const SHIP_DECELERATION = SHIP_CONFIG.DECELERATION;
-export const ZOOM_INTERPOLATION = CAMERA_CONFIG.ZOOM_INTERPOLATION;
-export const STAR_FIELD_MULTIPLIER = STAR_CONFIG.FIELD_MULTIPLIER;
-export const STAR_FIELD_SPREAD = STAR_CONFIG.FIELD_SPREAD;
-export const MIN_PARALLAX = STAR_CONFIG.MIN_PARALLAX;
-export const MAX_PARALLAX = STAR_CONFIG.MAX_PARALLAX;
+// Zoom system
+export const MAX_ZOOM_OUT = 3;
+export const MIN_ZOOM = 1;
+export const ZOOM_SPEED = 0.1;
+
+// Bullet range (twice viewport width)
+export const BULLET_RANGE = VIEWPORT_WIDTH * 2;
+
+// Ship physics constants
+export const SHIP_FRICTION = 0.99;
+export const SHIP_DECELERATION = 0.92;
+
+// Camera constants
+export const ZOOM_INTERPOLATION = 0.1;
+
+// Starfield generation constants
+export const STAR_FIELD_MULTIPLIER = 3;
+export const STAR_FIELD_SPREAD = 1.5;
+export const MIN_PARALLAX = 0.3;
+export const MAX_PARALLAX = 0.7;
+
+// Ship invulnerability and death pause
+export const SHIP_INVULNERABILITY_MS = 2000; // 2 seconds
+export const DEATH_PAUSE_MS = 1000;          // 1 second
+
+// HUD positioning
+export const HUD_GUTTER_PX = 24;
+export const PLAYFIELD_FRAME_BORDER_OFFSET = 4; // accounts for 2px border on each side
+export const COUNTDOWN_COLOR_RANGE_DEGREES = 120;
+export const COUNTDOWN_SATURATION_PERCENT = 85;
+export const COUNTDOWN_LIGHTNESS_BASE_PERCENT = 45;
+export const COUNTDOWN_LIGHTNESS_DELTA = 20;
+export const COUNTDOWN_BRIGHTNESS_BOOST = 0.35;

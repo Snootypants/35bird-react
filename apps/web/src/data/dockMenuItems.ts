@@ -1,4 +1,4 @@
-import { Gamepad2, Hammer, Home, Moon, Rocket, Settings2, Sun } from 'lucide-react'
+import { Gamepad2, Hammer, Home, Moon, Palette, Rocket, Settings2, Sun } from 'lucide-react'
 
 import { createDynamicProp } from '@/lib/dockMenu'
 import type { DockMenuItem } from '@/types/dockMenu'
@@ -9,6 +9,10 @@ export const dockMenuItems: DockMenuItem[] = [
     label: 'Games',
     icon: Gamepad2,
     action: { kind: 'link', href: '/games' },
+    panel: {
+      title: 'Play the latest builds',
+      description: 'Jump into prototypes, arcade throwbacks, and experiments fresh from the studio.',
+    },
     children: [
       {
         id: 'asteroids',
@@ -22,18 +26,26 @@ export const dockMenuItems: DockMenuItem[] = [
     id: 'tools',
     label: 'Tools',
     icon: Hammer,
-    action: { kind: 'command', command: 'showTestItem1' },
+    action: { kind: 'link', href: '/tools' },
+    panel: {
+      title: 'Tools & utilities',
+      description: 'A growing kit of design and dev helpers built for 35Bird projects.',
+      imageBasePath: '/images/menu/tools-preview',
+    },
   },
   {
     id: 'theme',
-    label: createDynamicProp(({ theme }) => (theme === 'dark' ? 'Light mode' : 'Dark mode')),
-    icon: createDynamicProp(({ theme }) => (theme === 'dark' ? Sun : Moon)),
+    label: createDynamicProp(({ theme }) => (theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode')),
+    icon: createDynamicProp(({ theme, minimal }) => (minimal ? Palette : theme === 'dark' ? Sun : Moon)),
     action: { kind: 'command', command: 'toggleTheme' },
-    isActive: ({ testerOpen }) => Boolean(testerOpen),
+    panel: {
+      title: createDynamicProp(({ theme }) => (theme === 'dark' ? 'Light theme' : 'Dark theme')),
+      description: 'Toggle the site palette or open page settings while you fine-tune layouts.',
+    },
     children: [
       {
         id: 'page-settings',
-        label: createDynamicProp(({ testerOpen }) => (testerOpen ? 'Close page settings' : 'Page settings')),
+        label: createDynamicProp(({ testerOpen }) => (testerOpen ? 'Hide page settings' : 'Page settings')),
         icon: Settings2,
         action: { kind: 'command', command: 'toggleTester' },
         isActive: ({ testerOpen }) => Boolean(testerOpen),
@@ -42,7 +54,7 @@ export const dockMenuItems: DockMenuItem[] = [
   },
   {
     id: 'home',
-    label: 'Home',
+    label: 'Back to home',
     icon: Home,
     action: { kind: 'link', href: '/' },
   },

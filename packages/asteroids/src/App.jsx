@@ -1,80 +1,78 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Ship } from './components/Ship.js';
-import { Asteroid } from './components/Asteroid.js';
-import { Bullet } from './components/Bullet.js';
-import { checkCollision, wrapPosition } from './utils/collision.js';
-import { 
-  CANVAS_CONFIG, WORLD_CONFIG, SHIP_CONFIG, WEAPON_CONFIG,
-  ASTEROID_CONFIG, SCORING_CONFIG, STAR_CONFIG, CAMERA_CONFIG
-} from './utils/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CROSSHAIR_SIZE, INITIAL_LIVES, WORLD_WIDTH, WORLD_HEIGHT, PLAYFIELD_FRAME_BORDER_OFFSET, SURVIVAL_TUNING_DEFAULTS } from './utils/constants.js';
 import { LevelUpEffect } from './effects/LevelUpEffect.js';
 import { StageClearEffect } from './effects/StageClearEffect.js';
 import { HyperSpaceJumpEffect } from './effects/HyperSpaceJumpEffect.js';
-import { DeathEffect } from './effects/DeathEffect.js';
+import { DeathExplosion } from './effects/DeathExplosion.js';
 import { Camera } from './utils/camera.js';
-import { renderMinimap } from './components/Minimap.js';
-import { renderXpBar } from './components/XpBar.js';
-import { GameCore } from './components/GameCore.js';
-import { useAsteroids } from './hooks/useAsteroids.js';
-import { useInput } from './hooks/useInput.js';
-import { useStarfield } from './hooks/useStarfield.js';
-import { useTimer } from './hooks/useTimer.js';
+import { useGameWorld } from './hooks/useGameWorld.js';
+import { useGameSession } from './hooks/useGameSession.js';
+import { useGameControls } from './hooks/useGameControls.js';
+import { useGameLogic } from './hooks/useGameLogic.js';
+import { useResponsiveLayout } from './hooks/useResponsiveLayout.js';
 import { useGameLoop } from './hooks/useGameLoop.js';
-import { updateGame } from './game/gameLogic.js';
-import { useGameLayout } from './hooks/useGameLayout.js';
-import PauseOverlay from './components/PauseOverlay.jsx';
-import StartOverlay from './components/StartOverlay.jsx';
-import GameOverOverlay from './components/GameOverOverlay.jsx';
-import DeathOverlay from './components/DeathOverlay.jsx';
+import { useGameTimer } from './hooks/useGameTimer.js';
+import { renderScene } from './render/gameRenderer.js';
+import { formatCountdown } from './utils/time.js';
+import GameHud from './components/ui/GameHud.jsx';
+import GameOverlayLayer from './components/ui/GameOverlayLayer.jsx';
+import TestConsole from './components/ui/TestConsole.jsx';
+import SurvivalTuningOverlay from './components/ui/SurvivalTuningOverlay.jsx';
+import DebugStatsDisplay from './components/ui/DebugStatsDisplay.jsx';
+import { useTestConsole } from './hooks/useTestConsole.js';
+import { useHyperCountdownDisplay } from './hooks/useHyperCountdownDisplay.js';
 import './App.css';
+import './styles/theme.css';
+import './styles/ui.css';
 
 function App() {
-  const { CANVAS_WIDTH, CANVAS_HEIGHT } = CANVAS_CONFIG;
-  const { WORLD_WIDTH, WORLD_HEIGHT } = WORLD_CONFIG;
-  const { SHIP_FRICTION, SHIP_DECELERATION } = SHIP_CONFIG;
-  const { BULLET_FIRE_RATE, MAX_BULLETS } = WEAPON_CONFIG;
-  const { INITIAL_ASTEROID_COUNT, ASTEROID_SIZE_LARGE, ASTEROID_SIZE_MEDIUM, ASTEROID_SIZE_SMALL } = ASTEROID_CONFIG;
-  const { SCORE_PER_ASTEROID, INITIAL_LIVES, XP_PER_ASTEROID, XP_LEVEL_BASE, XP_LEVEL_GROWTH } = SCORING_CONFIG;
-  const { CROSSHAIR_SIZE } = CAMERA_CONFIG;
-  const containerRef = useRef(null);
   const canvasRef = useRef(null);
-  const minimapCanvasRef = useRef(null);
-  const xpBarCanvasRef = useRef(null);
   const playAreaRef = useRef(null);
+  const canvasWidthRef = useRef(CANVAS_WIDTH);
+  const canvasHeightRef = useRef(CANVAS_HEIGHT);
+  const minimapCanvasRef = useRef(null);
   const shipRef = useRef(new Ship(WORLD_WIDTH / 2, WORLD_HEIGHT / 2));
   const cameraRef = useRef(new Camera());
   const bulletsRef = useRef([]);
-  const stageClearedRef = useRef(false);
   const keysRef = useRef({});
-  const scoreRef = useRef(0);
-  const livesRef = useRef(INITIAL_LIVES);
-  const xpRef = useRef(0);
-  const levelRef = useRef(1);
-  const levelUpEffectRef = useRef(new LevelUpEffect());
-  const stageClearEffectRef = useRef(new StageClearEffect());
-  const hyperSpaceJumpEffectRef = useRef(new HyperSpaceJumpEffect());
-  const deathEffectRef = useRef(new DeathEffect());
-  const deathSequenceActiveRef = useRef(false);
-  const stageRef = useRef(1);
-  const baseAsteroidCountRef = useRef(INITIAL_ASTEROID_COUNT);
-  const gameOverRef = useRef(false);
-  const gameStartedRef = useRef(false);
-  
-  const lastShotTimeRef = useRef(0);
-  const starsRef = useRef([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
-  // Track the last known mouse position in SCREEN coordinates so we can
-  // re-project it into world space every frame even when the mouse is idle
   const mouseScreenRef = useRef({ x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT / 2 });
   const isMouseDownRef = useRef(false);
   const isPausedRef = useRef(false);
   const testingModeRef = useRef(false);
-  const canvasWidthRef = useRef(CANVAS_WIDTH);
-  const canvasHeightRef = useRef(CANVAS_HEIGHT);
-  
-  // Simplified firing: handled in the main update loop via a single timer
+  const gameStartedRef = useRef(false);
+  const gameOverRef = useRef(false);
+  const livesRef = useRef(INITIAL_LIVES);
+  const lastShotTimeRef = useRef(0);
+  const levelUpEffectRef = useRef(new LevelUpEffect());
+  const stageClearEffectRef = useRef(new StageClearEffect());
+  const hyperSpaceJumpEffectRef = useRef(new HyperSpaceJumpEffect());
+  const deathExplosionRef = useRef(new DeathExplosion());
+  const portalRef = useRef(null);
+  const modeRef = useRef(null);
+  const survivalStateRef = useRef({ lastSpawnMs: 0, speedMultiplier: 1, spawnIntervalMs: SURVIVAL_TUNING_DEFAULTS.spawnIntervalMs });
+  const survivalTuningRef = useRef({ ...SURVIVAL_TUNING_DEFAULTS });
+  const [survivalTuning, setSurvivalTuning] = useState(() => ({ ...SURVIVAL_TUNING_DEFAULTS }));
+  const [survivalOverlayVisible, setSurvivalOverlayVisible] = useState(false);
+  const [testConsoleTab, setTestConsoleTab] = useState('effects');
+  const warmupRef = useRef({ active: false, endTime: 0 });
+  const applySurvivalTuning = useCallback((update) => {
+    setSurvivalTuning((prev) => {
+      const next = typeof update === 'function' ? update({ ...prev }) : { ...prev, ...update };
+      survivalTuningRef.current = next;
+      if (survivalStateRef.current) {
+        if (typeof next.spawnIntervalMs === 'number' && !Number.isNaN(next.spawnIntervalMs)) {
+          survivalStateRef.current.spawnIntervalMs = next.spawnIntervalMs;
+          const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+          survivalStateRef.current.lastSpawnMs = now;
+        }
+      }
+      return next;
+    });
+  }, []);
   const [uiState, setUiState] = useState({
-    score: 0,
+    currency: 0,
     lives: INITIAL_LIVES,
     xp: 0,
     level: 1,
@@ -82,460 +80,345 @@ function App() {
     gameStarted: false,
     isPaused: false,
     testingMode: false,
-    mode: null, // 'waves' | 'survival'
-    timeString: '0:00',
-    finalStats: null,
-    showDeathOverlay: false
+    mode: null,
+    hyperCountdownMs: 0,
+    round: 1,
+    survivalHold: false,
   });
-  // Layout state for responsive HUD placement
-  const [layout, setLayout] = useState({ minimapBottom: -90 });
-  const [metaLayout, setMetaLayout] = useState({ playWidth: CANVAS_WIDTH, minimapWidth: 160, leftHudX: 0, rightHudX: CANVAS_WIDTH - 80 });
   const [bulletCount, setBulletCount] = useState(0);
+  const [lastRun, setLastRun] = useState({ level: 1, wave: 1, time: '00:00:00', currency: 0 });
+  const prevGameOverRef = useRef(false);
+  const {
+    initializeAsteroids,
+    generateStarfield,
+    currencyRef,
+    xpRef,
+    levelRef,
+    stageRef,
+    baseAsteroidCountRef,
+    clearPickups,
+    clearAsteroids,
+    clearHyperCountdown,
+    startNewStage,
+    xpNeededForNextLevel,
+    asteroidCountsRef,
+    hyperCountdownRef,
+    asteroidsRef,
+    pickupsRef,
+    starsRef,
+    spawnPickups,
+    updatePickups,
+    updateAsteroidCounts,
+    triggerLevelUp,
+  } = useGameWorld({ shipRef, bulletsRef, setBulletCount, levelUpEffectRef, stageClearEffectRef, hyperSpaceJumpEffectRef, modeRef, setUiState });
+  const { start, pause, reset, formattedTime, elapsedMs } = useGameTimer();
 
-  const { generateStarfield } = useStarfield(starsRef);
-
-  const { asteroidsRef, asteroidCountsRef, initializeAsteroids, updateAsteroidCounts, startNewStage } = useAsteroids(gameStartedRef, gameOverRef, stageClearedRef, hyperSpaceJumpEffectRef, shipRef, stageRef, baseAsteroidCountRef, bulletsRef, setBulletCount, generateStarfield, starsRef, stageClearEffectRef);
-
-  const xpNeededForNextLevel = useCallback((level) => Math.round(XP_LEVEL_BASE * Math.pow(XP_LEVEL_GROWTH, Math.max(0, level - 1))), []);
-
-  const triggerLevelUp = useCallback((newLevel) => {
-    const ship = shipRef.current;
-    if (!ship) return;
-    levelUpEffectRef.current.trigger(ship.x, ship.y, newLevel);
-  }, []);
-
-  const addXp = useCallback((amount) => {
-    let newXp = xpRef.current + amount;
-    let newLevel = levelRef.current;
-    let needed = xpNeededForNextLevel(newLevel);
-    while (newXp >= needed) {
-      newXp -= needed;
-      newLevel += 1;
-      needed = xpNeededForNextLevel(newLevel);
-    }
-    xpRef.current = newXp;
-    if (newLevel !== levelRef.current) {
-      levelRef.current = newLevel;
-      triggerLevelUp(newLevel);
-    }
-  }, [xpNeededForNextLevel, triggerLevelUp]);
-
-  
-
-  // Initialize asteroids and stars
-  useEffect(() => {
-    initializeAsteroids();
-
-    // Generate initial starfield
-    generateStarfield();
-  }, [generateStarfield, initializeAsteroids]);
-
-  useInput({
-    gameStarted: gameStartedRef.current,
-    gameOver: gameOverRef.current,
-    isPaused: isPausedRef.current,
-    testingMode: testingModeRef.current,
+  const session = useGameSession({
+    setUiState,
+    shipRef,
+    isPausedRef,
+    bulletsRef,
+    setBulletCount,
     canvasRef,
     cameraRef,
+    mouseScreenRef,
+    mousePositionRef,
+    gameStartedRef,
+    gameOverRef,
+    currencyRef,
+    livesRef,
+    lastShotTimeRef,
+    xpRef,
+    levelRef,
+    stageRef,
+    baseAsteroidCountRef,
+    initializeAsteroids,
+    generateStarfield,
+    clearPickups,
+    clearAsteroids,
+    clearHyperCountdown,
+    modeRef,
+    survivalStateRef,
+    setLastRun,
+    formattedTime,
+    portalRef,
+    survivalTuningRef,
+    warmupRef,
+  });
+
+  const {
+    statOptions,
+    statSelections,
+    toggleStat: handleToggleDebugStat,
+    effectActions,
+    frameRate: debugFrameRate,
+    onFrame: handleFrameSample,
+    survivalControls,
+  } = useTestConsole({
+    shipRef,
+    deathExplosionRef,
+    hyperSpaceJumpEffectRef,
+    stageClearEffectRef,
+    triggerLevelUp,
+    levelRef,
+    stageRef,
+    baseAsteroidCountRef,
+    starsRef,
+    startNewStage,
+    survivalTuning,
+    setSurvivalTuning: applySurvivalTuning,
+    survivalOverlayVisible,
+    setSurvivalOverlayVisible,
+    survivalStateRef,
+    restartGame: session.startGame,
+  });
+
+  useEffect(() => {
+    if (!uiState.testingMode) {
+      setTestConsoleTab('effects');
+    }
+  }, [uiState.testingMode]);
+
+  const handleSelectConsoleTab = useCallback((tab) => {
+    if ((tab === 'survival' || tab === 'telemetry') && !survivalControls) {
+      return;
+    }
+    setTestConsoleTab(tab);
+  }, [survivalControls]);
+
+  const hasActiveDebugStats = Object.values(statSelections).some(Boolean);
+
+  useGameControls({
+    canvasRef,
     keysRef,
     mousePositionRef,
     mouseScreenRef,
     isMouseDownRef,
+    isPausedRef,
+    testingModeRef,
+    shootBullet: session.shootBullet,
     hyperSpaceJumpEffectRef,
-    onPause: () => {
-      isPausedRef.current = !isPausedRef.current;
-      setUiState(prev => ({ ...prev, isPaused: isPausedRef.current }));
-    },
-    onToggleTestingMode: () => {
-      testingModeRef.current = !testingModeRef.current;
-      setUiState(prev => ({ ...prev, testingMode: testingModeRef.current }));
-    },
-    onTriggerLevelUp: () => triggerLevelUp(levelRef.current),
-    onStageClear: () => stageClearEffectRef.current.trigger(),
-    onHyperSpaceJump: () => {
-      const ship = shipRef.current;
-      if (ship) {
-        hyperSpaceJumpEffectRef.current.trigger(
-          ship.angle,
-          stageRef.current,
-          baseAsteroidCountRef.current,
-          startNewStage
-        );
-        hyperSpaceJumpEffectRef.current.initStarVelocities(starsRef.current);
-      }
-    },
-    onGameOver: () => {
-      gameOverRef.current = true;
-      stopTimer();
-      setUiState(prev => ({ 
-        ...prev, 
-        gameOver: true,
-        finalStats: {
-          wave: stageRef.current,
-          level: levelRef.current,
-          score: scoreRef.current,
-          timeString: formatTime(elapsedTimeRef.current)
-        }
-      }));
-    },
-    onDeathEffect: () => {
-      const ship = shipRef.current;
-      if (ship) {
-        deathEffectRef.current.trigger(ship.x, ship.y);
-        livesRef.current = 0;
-      }
-    },
-    onShoot: shootBullet,
-    onStartNewStage: () => {
-      if (hyperSpaceJumpEffectRef.current.phase === 'waiting') {
-        hyperSpaceJumpEffectRef.current.startNewStage();
-      }
-    },
+    deathExplosionRef,
+    startGame: session.startGame,
+    setUiState,
+    cameraRef,
+    gameStartedRef,
+    gameOverRef,
+    testingEffectActions: effectActions,
   });
 
-  const { formatTime, startTimer, stopTimer, elapsedTimeRef, pausedTimeRef } = useTimer(gameStartedRef, gameOverRef, isPausedRef, deathSequenceActiveRef, setUiState);
+  const { update } = useGameLogic({
+    gameOverRef,
+    gameStartedRef,
+    isPausedRef,
+    cameraRef,
+    canvasWidthRef,
+    canvasHeightRef,
+    keysRef,
+    shipRef,
+    mouseScreenRef,
+    mousePositionRef,
+    asteroidsRef,
+    bulletsRef,
+    setBulletCount,
+    isMouseDownRef,
+    lastShotTimeRef,
+    livesRef,
+    spawnPickups,
+    updatePickups,
+    levelUpEffectRef,
+    stageClearEffectRef,
+    hyperSpaceJumpEffectRef,
+    deathExplosionRef,
+    starsRef,
+    updateAsteroidCounts,
+    modeRef,
+    survivalStateRef,
+    survivalTuningRef,
+    survivalElapsedMs: elapsedMs,
+    portalRef,
+    setUiState,
+    warmupRef,
+  });
 
-  const startGame = () => {
-    gameStartedRef.current = true;
-    setUiState(prev => ({ ...prev, gameStarted: true, gameOver: false, xp: 0, level: 1 }));
-    scoreRef.current = 0;
-    livesRef.current = INITIAL_LIVES;
-    xpRef.current = 0;
-    levelRef.current = 1;
-    gameOverRef.current = false;
-    lastShotTimeRef.current = 0;
-    pausedTimeRef.current = 0;
-    pauseStartRef.current = 0;
-    startTimer();
-    shipRef.current = new Ship(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-    bulletsRef.current = [];
-    setBulletCount(0);
-    stageClearedRef.current = false;
-    stageRef.current = 1;
-    baseAsteroidCountRef.current = INITIAL_ASTEROID_COUNT;
-    
-    // Reset camera
-    const camera = cameraRef.current;
-    camera.x = WORLD_WIDTH / 2;
-    camera.y = WORLD_HEIGHT / 2;
-    camera.zoom = 1;
-    camera.targetZoom = 1;
-    
-    // Initialize crosshair: seed screen position slightly to the right of center
-    const canvas = canvasRef.current;
-    const cw = (canvas?.width) || CANVAS_WIDTH;
-    const ch = (canvas?.height) || CANVAS_HEIGHT;
-    mouseScreenRef.current = { x: cw / 2 + 50, y: ch / 2 };
-    const worldPos = cameraRef.current.screenToWorld(mouseScreenRef.current.x, mouseScreenRef.current.y, cw, ch);
-    mousePositionRef.current = { x: worldPos.x, y: worldPos.y };
-    
-    deathEffectRef.current.reset();
-    // Re-initialize asteroids
+  const { metaLayout } = useResponsiveLayout({ canvasRef, playAreaRef, canvasWidthRef, canvasHeightRef });
+
+  useEffect(() => {
     initializeAsteroids();
-    
-    // Regenerate starfield for new game
     generateStarfield();
-  };
+  }, [initializeAsteroids, generateStarfield]);
 
-  const shootBullet = useCallback((bypassLimit = false) => {
-    const ship = shipRef.current;
-    if (ship && gameStartedRef.current && !gameOverRef.current) {
-      if (bypassLimit || bulletsRef.current.length < MAX_BULLETS) {
-        bulletsRef.current.push(new Bullet(ship.x, ship.y, ship.angle));
-        setBulletCount(bulletsRef.current.length);
-      }
-    }
-  }, []);
+  useEffect(() => {
+    modeRef.current = uiState.mode;
+  }, [uiState.mode]);
 
-  // Removed interval-based continuous shooting; handled in update()
+  useEffect(() => {
+    const active =
+      uiState.mode === 'survival' &&
+      uiState.gameStarted &&
+      !uiState.isPaused &&
+      !uiState.gameOver &&
+      !uiState.survivalHold;
+    active ? start() : pause();
+  }, [uiState.mode, uiState.gameStarted, uiState.isPaused, uiState.gameOver, uiState.survivalHold, start, pause]);
 
-  const handleCanvasClick = () => {
-    // Starting is handled by StartOverlay buttons.
-    // Here, we only use clicks for stage transitions or gameplay.
-    if (!uiState.gameStarted) return;
-  };
+  useEffect(() => {
+    if (!uiState.gameStarted || uiState.mode !== 'survival') reset();
+  }, [uiState.gameStarted, uiState.mode, reset]);
+  const render = useCallback(() => {
+    renderScene({
+      canvasRef,
+      canvasWidthRef,
+      canvasHeightRef,
+      minimapCanvasRef,
+      cameraRef,
+      starsRef,
+      shipRef,
+      asteroidsRef,
+      pickupsRef,
+      bulletsRef,
+      mousePositionRef,
+      gameStartedRef,
+      levelUpEffectRef,
+      stageClearEffectRef,
+      hyperSpaceJumpEffectRef,
+      deathExplosionRef,
+      portalRef,
+      CROSSHAIR_SIZE,
+    });
+  }, [
+    canvasRef,
+    canvasWidthRef,
+    canvasHeightRef,
+    minimapCanvasRef,
+    cameraRef,
+    starsRef,
+    shipRef,
+    asteroidsRef,
+    pickupsRef,
+    bulletsRef,
+    mousePositionRef,
+    gameStartedRef,
+    levelUpEffectRef,
+    stageClearEffectRef,
+    hyperSpaceJumpEffectRef,
+    deathExplosionRef,
+  ]);
+  useGameLoop({
+    update,
+    render,
+    setUiState,
+    currencyRef,
+    livesRef,
+    gameOverRef,
+    xpRef,
+    levelRef,
+    hyperCountdownRef,
+    onFrame: handleFrameSample,
+  });
 
-  const handleSelectMode = useCallback((mode) => {
-    setUiState(prev => ({ ...prev, mode }));
-    startGame(); // For now both modes start the same gameplay
-  }, []);
-
-  const handleResume = useCallback(() => {
-    isPausedRef.current = false;
-    setUiState(prev => ({ ...prev, isPaused: false }));
-  }, []);
-
-  const handlePlayAgain = () => {
-    startGame();
-  };
-
-  const handleMainMenu = () => {
-    handleExitToMenu();
-  };
-
-  const handleContinueDeath = () => {
-    // Calculate how long we were paused
-    if (pauseStartRef.current > 0) {
-      pausedTimeRef.current += Date.now() - pauseStartRef.current;
-      pauseStartRef.current = 0;
-    }
-    
-    // Hide overlay and unpause game
-    setUiState(prev => ({ ...prev, showDeathOverlay: false }));
-    deathSequenceActiveRef.current = false;
-    
-    // Create new ship with invulnerability
-    shipRef.current = new Ship(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-    shipRef.current.invulnerable = true;
-    shipRef.current.invulnerableUntil = Date.now() + 3000; // 3 seconds
-    
-    // Reset death effect
-    deathEffectRef.current.reset();
-  };
-
-  const handleExitToMenu = useCallback(() => {
-    // Clear gameplay state and return to start menu
-    isPausedRef.current = false;
-    gameStartedRef.current = false;
-    gameOverRef.current = false;
-    deathSequenceActiveRef.current = false;
-    stopTimer();
-    bulletsRef.current = [];
-    asteroidsRef.current = [];
-    setBulletCount(0);
-    // Stop active effects
-    levelUpEffectRef.current.active = false;
-    stageClearEffectRef.current.active = false;
-    hyperSpaceJumpEffectRef.current.active = false;
-    // Reset basic UI
-    setUiState(prev => ({ ...prev, isPaused: false, gameStarted: false }));
-  }, []);
-
-  
-
-  
-
-  const render = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return; // jsdom/test environment safeguard
-    const canvasWidth = canvasWidthRef.current || CANVAS_WIDTH;
-    const canvasHeight = canvasHeightRef.current || CANVAS_HEIGHT;
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-    const camera = cameraRef.current;
-
-    // Draw parallax stars (background) - with hyperspace effect support
-    if (hyperSpaceJumpEffectRef.current.active && 
-        (hyperSpaceJumpEffectRef.current.phase === 'brighten' || 
-         hyperSpaceJumpEffectRef.current.phase === 'streaking')) {
-      hyperSpaceJumpEffectRef.current.drawStars(ctx, starsRef.current, camera, canvasWidth, canvasHeight);
-    } else {
-      starsRef.current.forEach((star) => {
-        // Calculate parallax position
-        const parallaxX = star.x - camera.x * star.parallax;
-        const parallaxY = star.y - camera.y * star.parallax;
-        
-        const screenPos = camera.worldToScreen(parallaxX, parallaxY, canvasWidth, canvasHeight);
-        
-        // Only draw if visible (with margin for star wrapping)
-        if (screenPos.x >= -50 && screenPos.x <= canvasWidth + 50 && 
-            screenPos.y >= -50 && screenPos.y <= canvasHeight + 50) {
-          ctx.save();
-          // Boost perceived brightness ~20% while clamping to 1.0
-          ctx.globalAlpha = Math.min(1, star.brightness * 1.2);
-          ctx.fillStyle = 'white';
-          ctx.fillRect(screenPos.x, screenPos.y, star.size / camera.zoom, star.size / camera.zoom);
-          ctx.restore();
-        }
+  useEffect(() => {
+    if (!prevGameOverRef.current && uiState.gameOver) {
+      const wave = uiState.mode === 'waves' ? stageRef.current : 1;
+      setLastRun({
+        level: uiState.level,
+        wave,
+        time: formattedTime,
+        currency: uiState.currency,
       });
     }
+    prevGameOverRef.current = uiState.gameOver;
+  }, [uiState.gameOver, uiState.mode, uiState.level, uiState.currency, formattedTime, stageRef, setLastRun]);
 
-    // Draw ship (with hyperspace fade support) - hide during death effect
-    if (!deathEffectRef.current.active && shipRef.current && camera.isVisible(shipRef.current.x, shipRef.current.y, 50, canvasWidth, canvasHeight)) {
-      const screenPos = camera.worldToScreen(shipRef.current.x, shipRef.current.y, canvasWidth, canvasHeight);
-      ctx.save();
-      
-      // Apply hyperspace opacity if active
-      if (hyperSpaceJumpEffectRef.current.active) {
-        ctx.globalAlpha = hyperSpaceJumpEffectRef.current.getShipOpacity();
-      }
-      
-      ctx.translate(screenPos.x, screenPos.y);
-      ctx.scale(1/camera.zoom, 1/camera.zoom);
-      ctx.translate(-shipRef.current.x, -shipRef.current.y);
-      shipRef.current.draw(ctx);
-      ctx.restore();
-    }
-    
-    // Draw asteroids (with culling and hyperspace fade)
-    asteroidsRef.current.forEach((asteroid) => {
-      if (asteroid && camera.isVisible(asteroid.x, asteroid.y, asteroid.size, canvasWidth, canvasHeight)) {
-        const screenPos = camera.worldToScreen(asteroid.x, asteroid.y, canvasWidth, canvasHeight);
-        ctx.save();
-        
-        // Apply hyperspace opacity if active
-        if (hyperSpaceJumpEffectRef.current.active) {
-          ctx.globalAlpha = hyperSpaceJumpEffectRef.current.getAsteroidsOpacity();
-        }
-        ctx.translate(screenPos.x, screenPos.y);
-        ctx.scale(1/camera.zoom, 1/camera.zoom);
-        // Draw asteroid using its draw method
-        ctx.translate(-asteroid.x, -asteroid.y);
-        asteroid.draw(ctx);
-        ctx.restore();
-      }
-    });
-    
-    // Draw bullets (with culling)
-    bulletsRef.current.forEach((bullet) => {
-      if (bullet && camera.isVisible(bullet.x, bullet.y, bullet.size, canvasWidth, canvasHeight)) {
-        const screenPos = camera.worldToScreen(bullet.x, bullet.y, canvasWidth, canvasHeight);
-        ctx.save();
-        ctx.translate(screenPos.x, screenPos.y);
-        ctx.scale(1/camera.zoom, 1/camera.zoom);
-        ctx.translate(-bullet.x, -bullet.y);
-        bullet.draw(ctx);
-        ctx.restore();
-      }
-    });
+  const debugStatsVisible = uiState.testingMode || hasActiveDebugStats;
 
-    // Draw crosshair at mouse position
-    if (gameStartedRef.current) {
-      const mousePos = mousePositionRef.current;
-      const screenPos = camera.worldToScreen(mousePos.x, mousePos.y, canvasWidth, canvasHeight);
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      // Horizontal line
-      ctx.moveTo(screenPos.x - CROSSHAIR_SIZE, screenPos.y);
-      ctx.lineTo(screenPos.x + CROSSHAIR_SIZE, screenPos.y);
-      // Vertical line
-      ctx.moveTo(screenPos.x, screenPos.y - CROSSHAIR_SIZE);
-      ctx.lineTo(screenPos.x, screenPos.y + CROSSHAIR_SIZE);
-      ctx.stroke();
-    }
-
-    // Render minimap separately
-    const minimapCtx = minimapCanvasRef.current?.getContext('2d');
-    if (minimapCtx) {
-      renderMinimap(minimapCtx, shipRef.current, asteroidsRef.current, cameraRef.current);
-    }
-
-    // Render XP bar
-    const xpBarCtx = xpBarCanvasRef.current?.getContext('2d');
-    if (xpBarCtx) {
-      renderXpBar(xpBarCtx, uiState.level, uiState.xp, xpNeededForNextLevel);
-    }
-
-    // Draw level-up effects (overlay)
-    levelUpEffectRef.current.draw(ctx, camera, canvasWidth, canvasHeight);
-    stageClearEffectRef.current.draw(ctx, camera, canvasWidth, canvasHeight);
-    hyperSpaceJumpEffectRef.current.draw(ctx, camera, canvasWidth, canvasHeight);
-    
-    // Draw death effect (after all game objects)
-    deathEffectRef.current.draw(ctx, camera, canvasWidth, canvasHeight);
-  };
-
-
-  useGameLoop(() => updateGame(deathEffectRef, livesRef, gameOverRef, stopTimer, setUiState, stageRef, levelRef, scoreRef, elapsedTimeRef, gameStartedRef, isPausedRef, deathSequenceActiveRef, cameraRef, keysRef, shipRef, canvasWidthRef, canvasHeightRef, mouseScreenRef, mousePositionRef, asteroidsRef, bulletsRef, setBulletCount, isMouseDownRef, lastShotTimeRef, addXp, updateAsteroidCounts, pauseStartRef, levelUpEffectRef, stageClearEffectRef, hyperSpaceJumpEffectRef, starsRef), render);
-
-  useGameLayout(containerRef, playAreaRef, canvasRef, minimapCanvasRef, xpBarCanvasRef, setLayout, setMetaLayout, canvasWidthRef, canvasHeightRef);
+  const { countdownActive, countdownColor, outerSpaceStyle } = useHyperCountdownDisplay({
+    mode: uiState.mode,
+    hyperCountdownMs: uiState.hyperCountdownMs,
+  });
+  const xpNeededForCurrentLevel = xpNeededForNextLevel(uiState.level);
 
   return (
-    <div ref={containerRef} className="asteroids-app">
-      <div className="play-area" ref={playAreaRef}>
-        <canvas 
-          ref={canvasRef} 
-          width={1200} 
-          height={900} 
-          onClick={handleCanvasClick}
+    <div className="outerSpace" style={outerSpaceStyle}>
+      <div
+        ref={playAreaRef}
+        className="playfieldFrame"
+        style={{
+          width: canvasWidthRef.current + PLAYFIELD_FRAME_BORDER_OFFSET,
+          height: canvasHeightRef.current + PLAYFIELD_FRAME_BORDER_OFFSET,
+          left: `${metaLayout.playX}px`,
+          top: `${metaLayout.playY}px`,
+          position: 'absolute'
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          width={canvasWidthRef.current}
+          height={canvasHeightRef.current}
           className="game-canvas"
           role="img"
           aria-label="Asteroids play area"
         />
-        {/* XP Bar above play area */}
-        <canvas ref={xpBarCanvasRef} className="xpbar-canvas" />
-        {uiState.gameStarted && !uiState.gameOver && (
-          <div className="timer-display">{uiState.timeString}</div>
-        )}
-        {!uiState.gameStarted && (
-          <StartOverlay onSelect={handleSelectMode} />
-        )}
-        {uiState.gameStarted && !uiState.gameOver && uiState.isPaused && (
-          <PauseOverlay 
-            xp={uiState.xp}
-            lives={uiState.lives}
-            largeCount={asteroidCountsRef.current.large}
-            mediumCount={asteroidCountsRef.current.medium}
-            smallCount={asteroidCountsRef.current.small}
-            onResume={handleResume}
-            onExit={handleExitToMenu}
-          />
-        )}
-        {uiState.showDeathOverlay && (
-          <DeathOverlay 
-            mode={uiState.mode}
-            wave={stageRef.current}
-            level={uiState.level}
-            timeString={uiState.timeString}
-            livesRemaining={uiState.lives}
-            onContinue={handleContinueDeath}
-          />
-        )}
-        {uiState.gameOver && uiState.finalStats && (
-          <GameOverOverlay 
-            mode={uiState.mode}
-            stats={uiState.finalStats}
-            onPlayAgain={handlePlayAgain}
-            onMainMenu={handleMainMenu}
-          />
-        )}
-        <canvas 
-          ref={minimapCanvasRef}
-          className="minimap-canvas"
-          style={{ bottom: `${layout.minimapBottom}px` }}
-        />
-        
-        {/* Score/Lives under play area, 50px left of minimap */}
-        <div style={{
-          position: 'absolute',
-          bottom: '-50px',
-          left: `${metaLayout.leftHudX}px`,
-          transform: 'translateX(-100%)',
-          display: 'flex',
-          gap: '24px',
-          fontSize: '20px',
-          fontWeight: 'bold',
-          color: 'white'
-        }}>
-          <div>XP: {uiState.xp}/{xpNeededForNextLevel(uiState.level)}</div>
-          <div>Lives: {uiState.lives}</div>
-        </div>
-
-        {/* Level indicator under play area, 50px right of minimap */}
-        <div style={{
-          position: 'absolute',
-          bottom: '-50px',
-          left: `${metaLayout.rightHudX}px`,
-          fontSize: '20px',
-          fontWeight: 'bold',
-          color: 'white'
-        }}>
-          Level: {uiState.level}
-        </div>
-      <div data-testid="bullet-count" style={{ display: 'none' }}>{bulletCount}</div>
-    </div>
-    <div className="hud-container">
-      <div className="hud-right">
-        </div>
       </div>
-      {uiState.testingMode && (
-        <div className="testing-mode-indicator">
-          Testing Mode ON
+
+      <GameHud
+        xp={uiState.xp}
+        xpMax={xpNeededForCurrentLevel}
+        level={uiState.level}
+        lives={uiState.lives}
+        wave={uiState.mode === 'waves' ? stageRef.current : 1}
+        time={formattedTime}
+        currency={uiState.currency}
+        minimapRef={minimapCanvasRef}
+        mode={uiState.mode}
+        round={uiState.round}
+      />
+
+      {countdownActive && (
+        <div className="hyperCountdownBanner" style={{ color: countdownColor }}>
+          <span className="label">Hyper jump in</span>
+          <span className="timer mono">{formatCountdown(uiState.hyperCountdownMs)}</span>
         </div>
       )}
+
+      <GameOverlayLayer
+        uiState={uiState}
+        session={session}
+        asteroidCounts={asteroidCountsRef.current}
+        lastRun={lastRun}
+      />
+
+      <TestConsole
+        open={uiState.testingMode}
+        effectActions={effectActions}
+        statOptions={statOptions}
+        statSelections={statSelections}
+        onToggleStat={handleToggleDebugStat}
+        survivalControls={survivalControls}
+        activeTab={testConsoleTab}
+        onSelectTab={handleSelectConsoleTab}
+      />
+
+      <DebugStatsDisplay
+        visible={debugStatsVisible}
+        selections={statSelections}
+        frameRate={debugFrameRate}
+        asteroidCounts={asteroidCountsRef.current}
+        uiState={uiState}
+        bulletCount={bulletCount}
+        xpRequired={xpNeededForCurrentLevel}
+        stageNumber={stageRef.current}
+      />
+
+      <SurvivalTuningOverlay
+        visible={survivalOverlayVisible}
+        tuning={survivalTuning}
+        survivalState={survivalStateRef.current}
+        elapsedMs={elapsedMs}
+      />
+
+
+      <div data-testid="bullet-count" style={{ display: 'none' }}>{bulletCount}</div>
     </div>
   );
 }

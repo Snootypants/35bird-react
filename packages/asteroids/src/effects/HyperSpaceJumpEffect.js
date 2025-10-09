@@ -19,9 +19,21 @@ export class HyperSpaceJumpEffect {
     this.streakSpeed = 0; // Acceleration factor for streaking
     this.onStageStart = null;
     this.extraStars = []; // Additional stars for the effect
+    this.customTitle = null;
+    this.customSubtitle = null;
+    this.customPrompt = 'click to start';
+    this.showPrompt = true;
   }
 
-  trigger(shipAngle, currentStage, currentAsteroidCount, onStageStart) {
+  trigger(shipAngle, currentStage, currentAsteroidCount, onStageStart, options = {}) {
+    const {
+      title = null,
+      subtitle = null,
+      prompt,
+      showPrompt = true,
+      nextStageNumber,
+    } = options ?? {};
+
     this.active = true;
     this.phase = 'brighten';
     this.timer = 0;
@@ -32,11 +44,15 @@ export class HyperSpaceJumpEffect {
     this.textOpacity = 0;
     this.textScale = 0;
     this.shipAngle = shipAngle;
-    this.stageNumber = currentStage + 1;
+    this.stageNumber = nextStageNumber ?? (currentStage + 1);
     this.asteroidCount = Math.ceil(currentAsteroidCount * 1.2);
     this.onStageStart = onStageStart;
     this.starBrightness = 1;
     this.streakSpeed = 0;
+    this.customTitle = title;
+    this.customSubtitle = subtitle;
+    this.customPrompt = prompt !== undefined ? prompt : 'click to start';
+    this.showPrompt = showPrompt;
     
     // Generate 300% more stars for dramatic effect
     this.generateExtraStars();
@@ -90,7 +106,7 @@ export class HyperSpaceJumpEffect {
     this.timer++;
 
     switch (this.phase) {
-      case 'brighten':
+      case 'brighten': {
         // Brighten stars to 400% over 20 frames
         this.starBrightness = 1 + (3 * Math.min(this.timer / 20, 1));
         if (this.timer >= 20) {
@@ -98,19 +114,20 @@ export class HyperSpaceJumpEffect {
           this.timer = 0;
         }
         break;
+      }
 
-      case 'streaking':
+      case 'streaking': {
         // Accelerating streak over 80 frames
         const progress = this.timer / 80;
         // Exponential acceleration curve
         this.streakSpeed = Math.pow(progress, 2) * 50;
-        
+
         // Start fading ship halfway through
         if (this.timer > 40) {
           this.shipOpacity = Math.max(0, 1 - ((this.timer - 40) / 40));
           this.asteroidsOpacity = Math.max(0, 1 - ((this.timer - 40) / 40));
         }
-        
+
         if (this.timer >= 80) {
           this.phase = 'flash';
           this.timer = 0;
@@ -118,23 +135,25 @@ export class HyperSpaceJumpEffect {
           this.asteroidsOpacity = 0;
         }
         break;
+      }
 
-      case 'flash':
+      case 'flash': {
         // Super fast white flash
         if (this.timer < 3) {
           this.flashOpacity = 1;
         } else {
           this.flashOpacity = Math.max(0, 1 - ((this.timer - 3) / 5));
         }
-        
+
         if (this.timer >= 8) {
           this.phase = 'fading';
           this.timer = 0;
           this.flashOpacity = 0;
         }
         break;
+      }
 
-      case 'fading':
+      case 'fading': {
         // Fade to black
         this.fadeOpacity = Math.min(1, this.timer / 20);
         if (this.timer >= 20) {
@@ -144,8 +163,9 @@ export class HyperSpaceJumpEffect {
           this.starBrightness = 1;
         }
         break;
+      }
 
-      case 'shipFadeIn':
+      case 'shipFadeIn': {
         // Ship fades in
         this.shipOpacity = Math.min(1, this.timer / 30);
         if (this.timer >= 30) {
@@ -153,8 +173,9 @@ export class HyperSpaceJumpEffect {
           this.timer = 0;
         }
         break;
+      }
 
-      case 'asteroidsFadeIn':
+      case 'asteroidsFadeIn': {
         // Asteroids fade in
         this.asteroidsOpacity = Math.min(1, this.timer / 30);
         if (this.timer >= 30) {
@@ -162,8 +183,9 @@ export class HyperSpaceJumpEffect {
           this.timer = 0;
         }
         break;
+      }
 
-      case 'text':
+      case 'text': {
         // Text animation
         const textProgress = Math.min(this.timer / 30, 1);
         this.textOpacity = textProgress;
@@ -172,17 +194,19 @@ export class HyperSpaceJumpEffect {
         } else {
           this.textScale = 1 + (0.2 * (1 - (textProgress - 0.5) * 2));
         }
-        
+
         if (this.timer >= 30) {
           this.phase = 'waiting';
           this.timer = 0;
           this.textScale = 1;
         }
         break;
+      }
 
-      case 'waiting':
+      case 'waiting': {
         // Wait for click
         break;
+      }
     }
   }
 
@@ -196,6 +220,11 @@ export class HyperSpaceJumpEffect {
       this.shipOpacity = 1;
       this.asteroidsOpacity = 1;
       this.extraStars = []; // Clear extra stars
+      this.customTitle = null;
+      this.customSubtitle = null;
+      this.customPrompt = 'click to start';
+      this.showPrompt = true;
+      this.onStageStart = null;
     }
   }
 
@@ -236,16 +265,29 @@ export class HyperSpaceJumpEffect {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
+      const titleText = this.customTitle ?? `STAGE ${this.stageNumber}`;
       ctx.strokeStyle = '#00FFFF';
       ctx.lineWidth = 4;
-      ctx.strokeText(`STAGE ${this.stageNumber}`, 0, -20);
-      
+      ctx.strokeText(titleText, 0, -20);
+
       ctx.fillStyle = '#FFFFFF';
-      ctx.fillText(`STAGE ${this.stageNumber}`, 0, -20);
-      
-      ctx.font = '28px Arial';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.fillText('click to start', 0, 40);
+      ctx.fillText(titleText, 0, -20);
+
+      let nextLineY = 40;
+
+      if (this.customSubtitle) {
+        ctx.font = '32px Arial';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.fillText(this.customSubtitle, 0, nextLineY);
+        nextLineY += 44;
+      }
+
+      const promptText = this.showPrompt && this.customPrompt ? this.customPrompt : null;
+      if (promptText) {
+        ctx.font = '28px Arial';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillText(promptText, 0, nextLineY);
+      }
       
       ctx.restore();
     }
