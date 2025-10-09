@@ -29,10 +29,16 @@ export function useTheme() {
     setTheme((previous) => (previous === 'light' ? 'dark' : 'light'))
   }, [])
 
+  const syncTheme = useCallback(() => {
+    const next = readStoredTheme()
+    setTheme(next)
+    applyThemeClass(next)
+  }, [])
+
   useEffect(() => {
     applyThemeClass(theme)
     persistTheme(theme)
   }, [persistTheme, theme])
 
-  return useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
+  return useMemo(() => ({ theme, toggleTheme, syncTheme }), [theme, toggleTheme, syncTheme])
 }

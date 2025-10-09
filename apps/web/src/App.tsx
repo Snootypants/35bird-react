@@ -17,13 +17,19 @@ import { HeroSettingsProvider } from './context/HeroSettingsProvider'
 import './App.css'
 
 function App() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, syncTheme } = useTheme()
   const location = useLocation()
   const isAsteroidsRoute = location.pathname.startsWith(ROUTES.playAsteroids.path)
 
   useEffect(() => {
     applySiteMetaToDocument()
   }, [])
+
+  useEffect(() => {
+    if (!isAsteroidsRoute) {
+      syncTheme()
+    }
+  }, [isAsteroidsRoute, syncTheme])
 
   return (
     <HeroSettingsProvider>
