@@ -307,7 +307,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
 
         const label = resolveDynamicProp<string>(item.label, runtimeContext)
         const iconComponent = resolveDynamicProp<LucideIcon>(item.icon, runtimeContext)
-        const iconSource = minimal ? Palette : iconComponent
+        const iconSource = minimal && item.id === 'theme' ? Palette : iconComponent
         const icon = makeIcon(iconSource)
         const panelImageAlt = resolvedPanelTitle ?? `${label} preview`
         const panelBackdropClass = resolvedPanelImage ? themeConfig.imageBackdrop : DOCK_PANEL_FALLBACK_BACKDROP
