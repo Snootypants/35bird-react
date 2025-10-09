@@ -1,38 +1,18 @@
-import { THEME_STORAGE_KEY } from '@/config/storage'
 import type { Theme } from '@/types'
 
-const AVAILABLE_THEMES = ['light', 'dark'] as const
+const FALLBACK_THEME: Theme = 'dark'
+const rawDefault = import.meta.env.VITE_DEFAULT_THEME
 
-type AvailableTheme = (typeof AVAILABLE_THEMES)[number]
+const normalizeTheme = (value: unknown): Theme => (value === 'light' ? 'light' : 'dark')
 
-const envDefault = import.meta.env.VITE_DEFAULT_THEME
+export const DEFAULT_THEME: Theme = normalizeTheme(rawDefault)
 
-const sanitizeTheme = (value: unknown): Theme => {
-  if (typeof value === 'string' && AVAILABLE_THEMES.includes(value as AvailableTheme)) {
-    return value as Theme
-  }
-  return 'dark'
-}
-
-export const DEFAULT_THEME: Theme = sanitizeTheme(envDefault)
-
-export const isDevEnvironment = import.meta.env.DEV
-
-export const validateStoredTheme = (value: unknown): Theme | null => {
-  if (typeof value !== 'string') return null
-  return AVAILABLE_THEMES.includes(value as AvailableTheme) ? (value as Theme) : null
-}
-
-export const getInitialTheme = (): Theme => {
+export const readStoredTheme = (): Theme => {
   if (typeof window === 'undefined') return DEFAULT_THEME
   try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY)
-    const sanitized = validateStoredTheme(stored)
-    return sanitized ?? DEFAULT_THEME
-  } catch (error) {
-    if (isDevEnvironment) {
-      console.warn('Theme persistence unavailable, using default theme', error)
-    }
-    return DEFAULT_THEME
+    const stored = window.localStorage.getItem('35bird-theme')
+    return normalizeTheme(stored ?? undefined)
+  } catch {
+    return FALLBACK_THEME
   }
 }
