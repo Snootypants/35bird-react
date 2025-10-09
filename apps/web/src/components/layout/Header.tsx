@@ -9,10 +9,9 @@ import { useHeroSettings } from '@/hooks/useHeroSettings'
 interface HeaderProps {
   theme: Theme
   onThemeToggle: () => void
-  minimal?: boolean
 }
 
-function Header({ theme, onThemeToggle, minimal = false }: HeaderProps) {
+function Header({ theme, onThemeToggle }: HeaderProps) {
   const { toggleTester, testerOpen } = useHeroSettings()
 
   const menuActions = useMemo(
@@ -33,7 +32,7 @@ function Header({ theme, onThemeToggle, minimal = false }: HeaderProps) {
           theme={theme}
           items={dockMenuItems}
           actions={menuActions}
-          context={{ testerOpen, minimal }}
+          context={{ testerOpen }}
         />
       </div>
     </header>

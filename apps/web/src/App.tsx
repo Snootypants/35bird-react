@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useTheme } from './hooks/useTheme'
 import Header from './components/layout/Header'
+import GameHeader from './components/layout/GameHeader'
 import HomePage from './components/layout/HomePage'
 import NotFound from './components/layout/NotFound'
 import ComingSoon from './components/layout/ComingSoon'
@@ -26,11 +27,14 @@ function App() {
       >
         <div className={`page ${isAsteroidsRoute ? 'asteroids-page' : 'bg-background text-foreground'}`}>
           {!isAsteroidsRoute && <SplashCursorBackground />}
-          <Header
-            theme={theme}
-            onThemeToggle={toggleTheme}
-            minimal={isAsteroidsRoute}
-          />
+          {isAsteroidsRoute ? (
+            <GameHeader />
+          ) : (
+            <Header
+              theme={theme}
+              onThemeToggle={toggleTheme}
+            />
+          )}
           {!isAsteroidsRoute && <HeroTestingPanel />}
           <main className={isAsteroidsRoute ? 'asteroids-main' : 'main relative z-10'} role="main">
             <Routes>
