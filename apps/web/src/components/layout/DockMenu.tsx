@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Palette, type LucideIcon } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import clsx from 'clsx'
 
 import {
@@ -99,7 +99,6 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
   const [panelImages, setPanelImages] = useState<Record<string, string | null>>({})
 
   const runtimeContext: DockMenuRuntimeContext = { theme, ...(context ?? {}) }
-  const { minimal = false } = runtimeContext as { minimal?: boolean }
 
 
   useEffect(() => () => {
@@ -307,8 +306,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
 
         const label = resolveDynamicProp<string>(item.label, runtimeContext)
         const iconComponent = resolveDynamicProp<LucideIcon>(item.icon, runtimeContext)
-        const iconSource = minimal && item.id === 'theme' ? Palette : iconComponent
-        const icon = makeIcon(iconSource)
+        const icon = makeIcon(iconComponent)
         const panelImageAlt = resolvedPanelTitle ?? `${label} preview`
         const panelBackdropClass = resolvedPanelImage ? themeConfig.imageBackdrop : DOCK_PANEL_FALLBACK_BACKDROP
         const panelOverlayClass = resolvedPanelImage ? themeConfig.imageOverlay : DOCK_PANEL_FALLBACK_OVERLAY

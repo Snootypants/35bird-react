@@ -1,4 +1,4 @@
-import { Gamepad2, Hammer, Home, Moon, Palette, Rocket, Settings2, Sun } from 'lucide-react'
+import { Gamepad2, Hammer, Home, Moon, Rocket, Settings2, Sun } from 'lucide-react'
 
 import { createDynamicProp } from '@/lib/dockMenu'
 import type { DockMenuItem } from '@/types/dockMenu'
@@ -36,7 +36,7 @@ export const dockMenuItems: DockMenuItem[] = [
   {
     id: 'theme',
     label: createDynamicProp(({ theme }) => (theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode')),
-    icon: createDynamicProp(({ theme, minimal }) => (minimal ? Palette : theme === 'dark' ? Sun : Moon)),
+    icon: createDynamicProp(({ theme }) => (theme === 'dark' ? Sun : Moon)),
     action: { kind: 'command', command: 'toggleTheme' },
     panel: {
       title: createDynamicProp(({ theme }) => (theme === 'dark' ? 'Light theme' : 'Dark theme')),
