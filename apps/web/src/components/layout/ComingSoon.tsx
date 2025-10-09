@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 
+import { ROUTES } from '@/config/routes'
 import { Typography } from '../ui/typography'
 
 interface ComingSoonProps {
@@ -24,11 +25,11 @@ function ComingSoon({ title, description = 'We are putting the finishing touches
         {description}
       </Typography>
       <Link
-        to="/"
+        to={ROUTES.home.path}
         className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to home
+        Back to {ROUTES.home.label}
       </Link>
     </motion.section>
   )

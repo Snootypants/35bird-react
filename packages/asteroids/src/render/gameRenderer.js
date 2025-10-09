@@ -2,6 +2,8 @@
 
 import { Minimap } from '../components/Minimap.js';
 
+const getNow = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
 export function renderScene({
   canvasRef,
   canvasWidthRef,
@@ -32,7 +34,7 @@ export function renderScene({
   const canvasHeight = canvasHeightRef.current || 900;
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  const nowMs = performance.now();
+  const nowMs = getNow();
 
   const camera = cameraRef.current;
 

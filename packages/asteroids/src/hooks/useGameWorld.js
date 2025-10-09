@@ -38,31 +38,23 @@ export function useGameWorld({
   const hyperCountdownStageTimeoutRef = useRef(null);
   const waveSpeedRangeRef = useRef({ minSpeed: ASTEROID_SPEED, maxSpeed: ASTEROID_SPEED });
 
-  const pickCurrencyAmount = useCallback(() => {
-    const totalWeight = CURRENCY_DROP_WEIGHTS.reduce((sum, entry) => sum + entry.weight, 0);
+  const weightedSample = useCallback((entries) => {
+    if (!Array.isArray(entries) || entries.length === 0) return null;
+    const totalWeight = entries.reduce((sum, entry) => sum + entry.weight, 0);
     const roll = Math.random() * totalWeight;
     let cumulative = 0;
-    for (const entry of CURRENCY_DROP_WEIGHTS) {
+    for (const entry of entries) {
       cumulative += entry.weight;
       if (roll <= cumulative) {
         return entry.amount;
       }
     }
-    return CURRENCY_DROP_WEIGHTS[CURRENCY_DROP_WEIGHTS.length - 1].amount;
+    return entries[entries.length - 1].amount;
   }, []);
 
-  const pickXpCount = useCallback(() => {
-    const totalWeight = XP_DROP_WEIGHTS.reduce((sum, entry) => sum + entry.weight, 0);
-    const roll = Math.random() * totalWeight;
-    let cumulative = 0;
-    for (const entry of XP_DROP_WEIGHTS) {
-      cumulative += entry.weight;
-      if (roll <= cumulative) {
-        return entry.amount;
-      }
-    }
-    return XP_DROP_WEIGHTS[XP_DROP_WEIGHTS.length - 1].amount;
-  }, []);
+  const pickCurrencyAmount = useCallback(() => weightedSample(CURRENCY_DROP_WEIGHTS) ?? 0, [weightedSample]);
+
+  const pickXpCount = useCallback(() => weightedSample(XP_DROP_WEIGHTS) ?? 1, [weightedSample]);
 
   const computeWaveSpeedRange = useCallback((stageNumber) => {
     const effectiveStage = Math.max(0, stageNumber - 1);

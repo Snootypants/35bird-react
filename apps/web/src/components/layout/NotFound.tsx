@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Home } from 'lucide-react'
 
+import { ROUTES } from '@/config/routes'
 import { Typography } from '../ui/typography'
 
 function NotFound() {
@@ -27,11 +28,11 @@ function NotFound() {
           The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
         </Typography>
         <Link
-          to="/"
-          className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          to={ROUTES.home.path}
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
         >
           <Home className="w-4 h-4" />
-          Back to Home
+          Back to {ROUTES.home.label}
         </Link>
       </motion.div>
     </motion.div>

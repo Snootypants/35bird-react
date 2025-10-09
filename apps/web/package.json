@@ -12,15 +12,12 @@
   },
   "dependencies": {
     "@35bird/asteroids": "workspace:*",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.400.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.7.0",
-    "shadcn-ui": "^0.9.5",
-    "tailwind-merge": "^3.3.1"
+    "react-router-dom": "^7.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

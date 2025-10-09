@@ -2,35 +2,36 @@ import { Gamepad2, Hammer, Home, Moon, Rocket, Settings2, Sun } from 'lucide-rea
 
 import { createDynamicProp } from '@/lib/dockMenu'
 import type { DockMenuItem } from '@/types/dockMenu'
+import { ROUTES } from '@/config/routes'
 
 export const dockMenuItems: DockMenuItem[] = [
   {
     id: 'games',
-    label: 'Games',
+    label: ROUTES.games.label,
     icon: Gamepad2,
-    action: { kind: 'link', href: '/games' },
+    action: { kind: 'link', href: ROUTES.games.path },
     panel: {
-      title: 'Play the latest builds',
-      description: 'Jump into prototypes, arcade throwbacks, and experiments fresh from the studio.',
+      title: ROUTES.games.description,
+      description: ROUTES.games.panelDescription,
     },
     children: [
       {
         id: 'asteroids',
-        label: 'Asteroids',
+        label: ROUTES.playAsteroids.label,
         icon: Rocket,
-        action: { kind: 'link', href: '/play/asteroids' },
+        action: { kind: 'link', href: ROUTES.playAsteroids.path },
       },
     ],
   },
   {
     id: 'tools',
-    label: 'Tools',
+    label: ROUTES.tools.label,
     icon: Hammer,
-    action: { kind: 'link', href: '/tools' },
+    action: { kind: 'link', href: ROUTES.tools.path },
     panel: {
-      title: 'Tools & utilities',
-      description: 'A growing kit of design and dev helpers built for 35Bird projects.',
-      imageBasePath: '/images/menu/tools-preview',
+      title: ROUTES.tools.description,
+      description: ROUTES.tools.panelDescription,
+      imageBasePath: ROUTES.tools.panelImage,
     },
   },
   {
@@ -56,6 +57,6 @@ export const dockMenuItems: DockMenuItem[] = [
     id: 'home',
     label: 'Back to home',
     icon: Home,
-    action: { kind: 'link', href: '/' },
+    action: { kind: 'link', href: ROUTES.home.path },
   },
 ]

@@ -1,39 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { THEME_STORAGE_KEY } from '@/config/storage'
+import { DEFAULT_THEME, getInitialTheme, isDevEnvironment, validateStoredTheme } from '@/config/theme'
 import type { Theme } from '@/types'
 
-const DEFAULT_THEME: Theme = 'dark'
-
-const applyThemeClass = (theme: Theme) => {
-  if (typeof document === 'undefined') {
-    return
-  }
-
-  document.documentElement.classList.toggle('dark', theme === 'dark')
+const applyThemeClass = (value: Theme) => {
+  if (typeof document === 'undefined') return
+  document.documentElement.classList.toggle('dark', value === 'dark')
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Get initial theme from localStorage or default to dark
-    let initial: Theme = DEFAULT_THEME
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
-        initial = stored ?? DEFAULT_THEME
-      } catch {
-        console.warn('localStorage unavailable, using default theme')
-      }
-      applyThemeClass(initial)
-    }
-    return initial
-  })
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme())
 
   const persistTheme = useCallback((value: Theme) => {
+    if (typeof window === 'undefined') return
     try {
       localStorage.setItem(THEME_STORAGE_KEY, value)
-    } catch {
-      console.warn('Failed to save theme to localStorage')
+    } catch (error) {
+      if (isDevEnvironment) {
+        console.warn('Failed to persist theme preference', error)
+      }
     }
   }, [])
 
@@ -42,9 +28,21 @@ export function useTheme() {
   }, [])
 
   useEffect(() => {
-    // Save theme to localStorage (with fallback)
-    persistTheme(theme)
+    if (typeof window === 'undefined') return
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== THEME_STORAGE_KEY) return
+      const nextValue = validateStoredTheme(event.newValue)
+      setTheme(nextValue ?? DEFAULT_THEME)
+    }
+
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  useEffect(() => {
     applyThemeClass(theme)
+    persistTheme(theme)
   }, [persistTheme, theme])
 
   return useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])

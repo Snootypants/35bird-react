@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
 import { Home } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import { DOCK_OFFSET } from '@/config/dockMenu'
+import { ROUTES } from '@/config/routes'
 
 function GameHeader() {
   return (
@@ -11,7 +12,7 @@ function GameHeader() {
         style={{ top: `${DOCK_OFFSET}px`, right: `${DOCK_OFFSET}px` }}
       >
         <Link
-          to="/"
+          to={ROUTES.home.path}
           aria-label="Back to home"
           className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/80 backdrop-blur transition hover:bg-white/15 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >

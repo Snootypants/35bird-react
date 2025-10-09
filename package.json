@@ -14,10 +14,7 @@
     "lint": "pnpm -r --parallel lint",
     "preview": "pnpm --filter @35bird/web preview"
   },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.1"
+  "devDependencies": {
+    "globals": "^16.3.0"
   }
 }

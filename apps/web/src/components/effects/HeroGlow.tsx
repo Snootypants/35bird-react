@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import { HERO_GLOW_DEFAULT_COLOR } from '@/config/heroGlow'
+import { HERO_ALT_TEXT } from '@/config/ui'
 import heroDefaultImage from '@/assets/hero.png'
 import { useHeroSettings } from '@/hooks/useHeroSettings'
 import { buildHeroGlowVariables, heroGlowCss } from '@/lib/heroGlow'
@@ -8,7 +9,7 @@ import type { HeroGlowProps } from '@/types/effects'
 
 export function HeroGlow({
   src = heroDefaultImage,
-  alt = 'Hero artwork',
+  alt = HERO_ALT_TEXT,
   glowColor = HERO_GLOW_DEFAULT_COLOR,
   className = '',
   forcedSize,

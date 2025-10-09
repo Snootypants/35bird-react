@@ -1,38 +1,48 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+const getNow = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+const scheduleFrame = typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'
+  ? window.requestAnimationFrame.bind(window)
+  : (callback) => setTimeout(() => callback(getNow()), 1000 / 60);
+
+const cancelFrame = typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function'
+  ? window.cancelAnimationFrame.bind(window)
+  : (id) => clearTimeout(id);
+
 export function useGameTimer() {
   const [elapsedMs, setElapsedMs] = useState(0);
   const runningRef = useRef(false);
-  const startTsRef = useRef(performance.now());
+  const startTsRef = useRef(getNow());
   const rafRef = useRef(0);
 
   const tick = useCallback((now) => {
     if (!runningRef.current) return;
     setElapsedMs(now - startTsRef.current);
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = scheduleFrame(tick);
   }, []);
 
   const start = useCallback(() => {
     if (runningRef.current) return;
     runningRef.current = true;
-    const now = performance.now();
-    startTsRef.current = now - elapsedMs;           // resume from where we left off
-    rafRef.current = requestAnimationFrame(tick);
+    const now = getNow();
+    startTsRef.current = now - elapsedMs;
+    rafRef.current = scheduleFrame(tick);
   }, [elapsedMs, tick]);
 
   const pause = useCallback(() => {
     if (!runningRef.current) return;
     runningRef.current = false;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (rafRef.current) cancelFrame(rafRef.current);
     rafRef.current = 0;
   }, []);
 
   const reset = useCallback(() => {
     runningRef.current = false;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (rafRef.current) cancelFrame(rafRef.current);
     rafRef.current = 0;
     setElapsedMs(0);
-    startTsRef.current = performance.now();         // reset base
+    startTsRef.current = getNow();
   }, []);
 
   const formattedTime = useMemo(() => {
@@ -43,7 +53,7 @@ export function useGameTimer() {
     return `${h}:${m}:${s}`;
   }, [elapsedMs]);
 
-  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+  useEffect(() => () => { if (rafRef.current) cancelFrame(rafRef.current); }, []);
 
   return { elapsedMs, formattedTime, start, pause, reset };
 }

@@ -3,8 +3,6 @@ import type { LucideIcon } from 'lucide-react'
 export type DockMenuCommandKey =
   | 'toggleTheme'
   | 'toggleTester'
-  | 'openTools'
-  | 'showTestItem1'
   | (string & {})
 
 export type DockMenuAction =

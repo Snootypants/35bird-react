@@ -1,5 +1,9 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Routes, Route, useLocation } from 'react-router-dom'
+
+import { applySiteMetaToDocument } from '@/config/site'
+import { ROUTES } from '@/config/routes'
 import { useTheme } from './hooks/useTheme'
 import Header from './components/layout/Header'
 import GameHeader from './components/layout/GameHeader'
@@ -15,7 +19,11 @@ import './App.css'
 function App() {
   const { theme, toggleTheme } = useTheme()
   const location = useLocation()
-  const isAsteroidsRoute = location.pathname.startsWith('/play/asteroids')
+  const isAsteroidsRoute = location.pathname.startsWith(ROUTES.playAsteroids.path)
+
+  useEffect(() => {
+    applySiteMetaToDocument()
+  }, [])
 
   return (
     <HeroSettingsProvider>
@@ -38,10 +46,26 @@ function App() {
           {!isAsteroidsRoute && <HeroTestingPanel />}
           <main className={isAsteroidsRoute ? 'asteroids-main' : 'main relative z-10'} role="main">
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/games" element={<ComingSoon title="Games" />} />
-              <Route path="/tools" element={<ComingSoon title="Tools" />} />
-              <Route path="/play/asteroids" element={<PlayAsteroids />} />
+              <Route path={ROUTES.home.path} element={<HomePage />} />
+              <Route
+                path={ROUTES.games.path}
+                element={(
+                  <ComingSoon
+                    title={ROUTES.games.label}
+                    description={ROUTES.games.description}
+                  />
+                )}
+              />
+              <Route
+                path={ROUTES.tools.path}
+                element={(
+                  <ComingSoon
+                    title={ROUTES.tools.label}
+                    description={ROUTES.tools.description}
+                  />
+                )}
+              />
+              <Route path={ROUTES.playAsteroids.path} element={<PlayAsteroids />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
