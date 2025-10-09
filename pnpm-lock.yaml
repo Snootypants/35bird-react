@@ -6,7 +6,20 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      '@types/react':
+        specifier: ^19.2.2
+        version: 19.2.2
+      '@types/react-dom':
+        specifier: ^19.2.1
+        version: 19.2.1(@types/react@19.2.2)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.0(react@19.2.0)
 
   apps/web:
     dependencies:
@@ -26,10 +39,10 @@ importers:
         specifier: ^0.400.0
         version: 0.400.0(react@19.2.0)
       react:
-        specifier: ^19.1.0
+        specifier: ^19.2.0
         version: 19.2.0
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^19.2.0
         version: 19.2.0(react@19.2.0)
       react-router-dom:
         specifier: ^7.7.0
@@ -51,10 +64,10 @@ importers:
         specifier: ^22.10.1
         version: 22.18.8
       '@types/react':
-        specifier: ^19.1.8
+        specifier: ^19.2.2
         version: 19.2.2
       '@types/react-dom':
-        specifier: ^19.1.6
+        specifier: ^19.2.1
         version: 19.2.1(@types/react@19.2.2)
       '@types/react-router-dom':
         specifier: ^5.3.3
