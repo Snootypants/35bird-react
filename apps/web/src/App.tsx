@@ -26,10 +26,8 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!isAsteroidsRoute) {
-      syncTheme()
-    }
-  }, [isAsteroidsRoute, syncTheme])
+    syncTheme()
+  }, [location.pathname, syncTheme])
 
   return (
     <HeroSettingsProvider>
