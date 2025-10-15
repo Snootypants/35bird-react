@@ -15,8 +15,8 @@ export const ROUTES = {
   games: {
     path: '/games',
     label: 'Games',
-    description: 'Play the latest builds',
-    panelDescription: 'Jump into prototypes, arcade throwbacks, and experiments fresh from the studio.',
+    description: "Ast'roids",
+    panelDescription: undefined,
   },
   tools: {
     path: '/tools',

@@ -29,8 +29,8 @@ export function useTheme() {
     setTheme((previous) => (previous === 'light' ? 'dark' : 'light'))
   }, [])
 
-  const syncTheme = useCallback(() => {
-    const next = readStoredTheme()
+  const syncTheme = useCallback((value?: Theme) => {
+    const next = value ?? readStoredTheme()
     setTheme(next)
     applyThemeClass(next)
   }, [])

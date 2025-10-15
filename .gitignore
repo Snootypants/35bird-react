@@ -23,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel/*
+!.vercel/README.md
+!.vercel/project.example.json

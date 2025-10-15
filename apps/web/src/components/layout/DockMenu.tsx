@@ -310,6 +310,10 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
         const panelImageAlt = resolvedPanelTitle ?? `${label} preview`
         const panelBackdropClass = resolvedPanelImage ? themeConfig.imageBackdrop : DOCK_PANEL_FALLBACK_BACKDROP
         const panelOverlayClass = resolvedPanelImage ? themeConfig.imageOverlay : DOCK_PANEL_FALLBACK_OVERLAY
+        const panelSizeClasses = resolvedPanelImage
+          ? 'w-[320px] max-w-[75vw]'
+          : 'max-w-[75vw] w-auto px-5 py-4'
+        const panelContentSpacingClasses = resolvedPanelImage ? 'mt-4 space-y-2 px-5 pb-5' : 'space-y-2'
         const childInactiveClasses = themeConfig.childInactive
         const childActiveClasses = themeConfig.childActive
 
@@ -386,12 +390,13 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
                   {panelConfig && (resolvedPanelImage || resolvedPanelTitle || resolvedPanelDescription) ? (
                     <div
                       className={clsx(
-                        'absolute right-full mr-4 w-[320px] max-w-[75vw] origin-top-right rounded-3xl border backdrop-blur-lg transition-[transform,opacity,filter] duration-200 ease-out saturate-125',
+                        'absolute right-full mr-4 origin-top-right rounded-3xl border text-left backdrop-blur-lg transition-[transform,opacity,filter] duration-200 ease-out saturate-125',
+                        panelSizeClasses,
                         themeConfig.surface,
                         themeConfig.shadow,
                         isPanelActive
-                        ? 'pointer-events-auto translate-y-0 opacity-100'
-                        : 'pointer-events-none -translate-y-4 translate-x-2 opacity-0 backdrop-blur-sm',
+                          ? 'pointer-events-auto translate-y-0 opacity-100'
+                          : 'pointer-events-none -translate-y-4 translate-x-2 opacity-0 backdrop-blur-sm',
                       )}
                       style={{ top: DOCK_SUBMENU_VERTICAL_OFFSET }}
                     >
@@ -416,7 +421,7 @@ function DockMenu({ theme, items, actions = {}, context }: DockMenuProps) {
                         </div>
                       ) : null}
                       {resolvedPanelTitle || resolvedPanelDescription ? (
-                        <div className={clsx('mt-4 space-y-2', resolvedPanelImage ? '' : 'pt-2')}>
+                        <div className={clsx(panelContentSpacingClasses)}>
                           {resolvedPanelTitle ? (
                             <h3 className="text-base font-semibold tracking-tight">{resolvedPanelTitle}</h3>
                           ) : null}

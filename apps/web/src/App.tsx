@@ -69,7 +69,10 @@ function App() {
                   />
                 )}
               />
-              <Route path={ROUTES.playAsteroids.path} element={<PlayAsteroids />} />
+              <Route
+                path={ROUTES.playAsteroids.path}
+                element={<PlayAsteroids onRestoreTheme={syncTheme} />}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
