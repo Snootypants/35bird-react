@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Routes, Route, useLocation } from 'react-router-dom'
 
 import { applySiteMetaToDocument } from '@/config/site'
 import { ROUTES } from '@/config/routes'
 import { useTheme } from './hooks/useTheme'
+import type { Theme } from './types'
 import Header from './components/layout/Header'
 import GameHeader from './components/layout/GameHeader'
 import HomePage from './components/layout/HomePage'
@@ -20,6 +21,7 @@ function App() {
   const { theme, toggleTheme, syncTheme } = useTheme()
   const location = useLocation()
   const isAsteroidsRoute = location.pathname.startsWith(ROUTES.playAsteroids.path)
+  const previousThemeRef = useRef<Theme | null>(null)
 
   useEffect(() => {
     applySiteMetaToDocument()
@@ -27,7 +29,29 @@ function App() {
 
   useEffect(() => {
     syncTheme()
-  }, [location.pathname, syncTheme])
+  }, [syncTheme])
+
+  useEffect(() => {
+    if (!isAsteroidsRoute) {
+      return
+    }
+    if (previousThemeRef.current === null) {
+      previousThemeRef.current = theme
+    }
+    if (theme !== 'dark') {
+      syncTheme('dark')
+    }
+  }, [isAsteroidsRoute, syncTheme, theme])
+
+  const handleAsteroidsRestoreTheme = useCallback(() => {
+    const previousTheme = previousThemeRef.current
+    previousThemeRef.current = null
+    if (previousTheme) {
+      syncTheme(previousTheme)
+    } else {
+      syncTheme()
+    }
+  }, [syncTheme])
 
   return (
     <HeroSettingsProvider>
@@ -71,7 +95,7 @@ function App() {
               />
               <Route
                 path={ROUTES.playAsteroids.path}
-                element={<PlayAsteroids onRestoreTheme={syncTheme} />}
+                element={<PlayAsteroids onRestoreTheme={handleAsteroidsRestoreTheme} />}
               />
               <Route path="*" element={<NotFound />} />
             </Routes>

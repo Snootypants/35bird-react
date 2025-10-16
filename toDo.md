@@ -251,3 +251,70 @@ Review 03.06.25 - 22:40
 [ ] Review DockMenu flyout implementation
 [ ] Remove flyout and adjust menu layout/actions accordingly
 [ ] Run lint check
+
+## 10.16.25 - 09:18
+Return theme control to stored preference after exiting Asteroids.
+
+To Do List
+- [x] Capture pre-game theme in `apps/web/src/components/layout/GameShell.tsx`
+- [x] Restore the captured theme during cleanup instead of re-reading storage
+- [x] Remove redundant `localStorage` write from `GameShell` cleanup
+- [-] Manually test theme toggle before/after playing Asteroids {{-- not runnable in current CLI session --}}
+
+Review 10.16.25 - 09:25
+- Stored the original theme in a ref so cleanup restores it without re-reading forced dark state.
+- Removed direct `localStorage` writes from `GameShell` and now invoke the provided sync callback with the captured theme.
+- Recommend verifying in browser: toggle to light, enter/exit Asteroids, confirm the toggle remains responsive.
+
+## 10.16.25 - 09:31
+Centralize Asteroids theme restoration in App and simplify GameShell callback.
+
+To Do List
+- [x] Update `App.tsx` to handle restoring `previousThemeRef` during Asteroids exit
+- [x] Adjust `PlayAsteroids`/`GameShell` props so cleanup only signals restoration (no theme arg)
+- [x] Ensure GameShell still re-applies stored baseline classes/vars without altering theme storage
+- [-] Browser test theme toggle before/after Asteroids {{-- pending local run outside CLI }}
+
+Review 10.16.25 - 09:36
+- Moved Asteroids exit restoration into `App.tsx`, using `previousThemeRef` via a dedicated callback.
+- Simplified `GameShell` so it restores the baseline only and signals the parent without touching stored theme values.
+- Confirmed TypeScript passes; please verify in the browser that the toggle stays responsive after exiting Asteroids.
+
+## 10.16.25 - 11:29
+Prevent location sync from overriding restored theme.
+
+To Do List
+- [x] Adjust `App.tsx` initial sync effect to run only on mount
+- [x] Ensure theme still initializes from storage on first load
+- [-] Browser test theme toggle around Asteroids {{-- pending local run outside CLI }}
+
+Review 10.16.25 - 11:32
+- Limited the location-based `syncTheme` to a mount-only effect so exit restores are no longer overwritten.
+- Verified initialization still pulls from stored theme via the same effect and left manual browser verification outstanding.
+
+## 10.16.25 - 11:42
+Isolate Asteroids global styles so main theme regains control.
+
+To Do List
+- [x] Tag `<html>`/`body` with an `asteroids-active` class inside `GameShell`
+- [x] Override body/root background rules when not in Asteroids via `index.css`
+- [-] Browser test theme toggle after exiting Asteroids {{-- pending local run outside CLI }}
+
+Review 10.16.25 - 11:47
+- Added `asteroids-active` class toggling in `GameShell` so the integration can isolate arcade styling.
+- Overrode root/body background + color-scheme when the class is absent, letting the main theme reclaim the layout after exiting.
+- Typecheck stays green; please sanity-check in the browser to ensure the page background now follows the theme toggle post-game.
+
+## 10.16.25 - 12:11
+Scope Asteroids CSS to the `asteroids-active` class instead of overriding site styles.
+
+To Do List
+- [x] Update `packages/asteroids/src/styles/theme.css` selectors to `:root.asteroids-active`
+- [x] Scope `packages/asteroids/src/index.css` and `App.css` rules to `.asteroids-active`
+- [x] Remove temporary overrides from `apps/web/src/index.css`
+- [-] Browser test icon colors and submenu state after returning {{-- pending local run outside CLI }}
+
+Review 10.16.25 - 12:18
+- Updated Asteroids CSS files to honor an `asteroids-active` marker so their global styles only apply during gameplay.
+- Reverted the temporary root/body overrides in the main app now that the package styles are scoped correctly.
+- Still need a browser pass to confirm dock icon colors and submenu rendering after exiting the game.

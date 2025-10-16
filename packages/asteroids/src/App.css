@@ -1,4 +1,5 @@
-html, body {
+html.asteroids-active,
+body.asteroids-active {
   margin: 0;
   padding: 0;
   height: 100%;

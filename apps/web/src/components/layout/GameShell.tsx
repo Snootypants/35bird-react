@@ -1,14 +1,12 @@
 import { useEffect, useMemo } from 'react'
 
 import { captureDocumentBaseline, restoreDocumentBaseline } from '@/lib/documentState'
-import { THEME_STORAGE_KEY } from '@/config/storage'
 import { readStoredTheme } from '@/config/theme'
-import type { Theme } from '@/types'
 
 interface GameShellProps {
   children: React.ReactNode
   forceDark?: boolean
-  onRestoreTheme?: (theme: Theme) => void
+  onRestoreTheme?: () => void
 }
 
 function GameShell({ children, forceDark = true, onRestoreTheme }: GameShellProps) {
@@ -17,23 +15,23 @@ function GameShell({ children, forceDark = true, onRestoreTheme }: GameShellProp
   useEffect(() => {
     if (typeof document === 'undefined') return
     const root = document.documentElement
+    const body = document.body
 
+    root.classList.add('asteroids-active')
+    body?.classList.add('asteroids-active')
     if (forceDark) {
       root.classList.add('dark')
     }
 
     return () => {
+      root.classList.remove('asteroids-active')
+      body?.classList.remove('asteroids-active')
       restoreDocumentBaseline(baseline)
-      const theme = readStoredTheme()
-      root.classList.toggle('dark', theme === 'dark')
-      if (typeof window !== 'undefined') {
-        try {
-          window.localStorage.setItem(THEME_STORAGE_KEY, theme)
-        } catch {
-          // ignore
-        }
+      if (!baseline) {
+        const theme = readStoredTheme()
+        root.classList.toggle('dark', theme === 'dark')
       }
-      onRestoreTheme?.(theme)
+      onRestoreTheme?.()
     }
   }, [baseline, forceDark, onRestoreTheme])
 

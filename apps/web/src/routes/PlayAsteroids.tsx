@@ -2,12 +2,11 @@ import { lazy, Suspense } from 'react'
 
 import { ROUTES } from '@/config/routes'
 import GameShell from '@/components/layout/GameShell'
-import type { Theme } from '@/types'
 
 const Asteroids = lazy(() => import('@35bird/asteroids'))
 
 interface PlayAsteroidsProps {
-  onRestoreTheme?: (theme: Theme) => void
+  onRestoreTheme?: () => void
 }
 
 export default function PlayAsteroids({ onRestoreTheme }: PlayAsteroidsProps) {
