@@ -1,17 +1,14 @@
 import React from 'react';
+import XpBar from './XpBar.jsx';
 
 export default function GameHud({ xp, xpMax, level, lives, wave, time, currency, minimapRef, mode, round = 1 }) {
-  const pct = Math.max(0, Math.min(1, xpMax ? xp / xpMax : 0));
   const showWave = mode === 'waves';
   const showTime = mode === 'survival';
   const roundLabel = `Round ${round}`;
 
   return (
     <div className="hudRoot">
-      <div className="xpBar">
-        <div className="xpFill" style={{ width: `${pct * 100}%` }} />
-        <div className="xpText">{`${xp} / ${xpMax} XP`}</div>
-      </div>
+      <XpBar xp={xp} xpMax={xpMax} />
 
       <div className="hudPanels">
         <div className="hudPanel">

@@ -13,12 +13,14 @@
   border: 2px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 .xpFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  box-shadow: 0 0 8px rgba(156, 240, 109, 0.35);
+  width: calc(var(--xp-progress, 0) * 100%);
+  background: linear-gradient(90deg, rgba(76, 110, 245, 0.65), rgba(118, 176, 255, 0.55));
+  box-shadow: 0 0 10px rgba(118, 176, 255, 0.25);
+  transition: width 160ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 .xpText {
   position: absolute; inset: 0;
